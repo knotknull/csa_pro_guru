@@ -1,0 +1,60 @@
+
+###################################################################################################
+##
+##  AWS Certified Solutions Architect Professional
+##  https://learn.acloud.guru/course/aws-certified-solutions-architect-professional-2019/dashboard
+##
+###################################################################################################
+
+
+## Intro
+
+Followup by taking AWS Certification Preparation Guide
+
+###################################################################################################
+## Data Stores
+###################################################################################################
+
+
+## Concepts 
+#############
+
+
+## Persistent Datastore
+Data is durable after reboots, restarts, powercycles
+	- Glacier
+	- RDS
+
+## Transient Datastore
+Data is temporarily stored and passed along to another process / persistent store
+	- SQS
+	- SNS
+
+## Ephemeral Datastore
+Data is lost when stopped
+	- EC2
+	- Memcached
+
+## IOPS vs Throughput
+
+Input/Output Operations per Second (IOPS)
+  Meassure how fast we can read and write to a device 
+
+Throughput
+  How much data can be moved at a time
+
+
+
+## Consistency Models: ACID & BASE
+Atomic		All or nothing
+Consistent	Must be valid
+Isolated	Transactions can't interfere
+Durable		Completed transaction stays around
+
+Basic Availability	values availability even if state
+Soft-state		might not be instantly consistent across stores
+Eventually Consistent	will achieve consistency at some point		
+
+
+## S3 
+#############
