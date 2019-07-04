@@ -76,7 +76,7 @@ S3 provides read-after-write 								Write it and read it immediately
 consistency for PUTS of new objects
 
 HEAD or GET requests of the key before      Respond with "never seen it" until
-an object exists will result in eventual    I completeley write new object and
+an object exists will result in eventual    I completely write new object and
 consistency																	fully replicate it.
 
 S3 offers eventual consistency for 					Update or delete completely locally,
@@ -165,7 +165,7 @@ Storage Class Analysis 							S3 Management Analytics
 
 Transfer Accelerations						Speed up data uploads using CloudFront in reverse
 
-Requestor Pays 										The requestor rather thant the bucket owner
+Requestor Pays 										The requestor rather than the bucket owner
 																	pays for requests and data transfer.
 
 Tags 															Assign tags to objects for use in costing,
@@ -320,4 +320,96 @@ REMEMBER:
 
 THINK Snapshots as collection of pointers to data.
 		- Pointers pulled forward to next most recent snap
+
+
+## Elastic File Service
+##########################
+
+	- implementation of NFS file share
+	- elastic storage capacity, and pay for only what you use (unlike EBS)
+	- EFS 3x expensive as EBS,  20x expensive as S3
+	- Multi-AZ metadata and data storage
+	- Configure mount-points in one or many AZs
+			- EC2 can mount local to their AZ
+	- Can be mounted from on-premises systems ONLY if using Direct Connect
+	- Alternatively, use EFS File Sync agent
+				- load on premise and syncronize to EFS
+
+	- EFS supports MOST features of NFS V4 BUT NOT ALL
+
+
++---------------------------------------------------+
+| AWS                                               |
+| +--------------------------------+                |
+| |                      US-East-1 |                |
+| | +-----+                        |                |
+| | | web +-----------+            |                |
+| | +-----+           |            |                |
+| |                   vMount Point]|    +------+    |
+| | +-----+            ^      +    |    |      |    |
+| | | web +------------+      +-------->+ EFS  |    |
+| | +-----+                        |    |      |    |
+| |                                |    |      |    |
+| +--------------------------------+    +---^--+    |
+|                                           |       |
+| +--------------------------------+        |       |
+| |                      US-East-2 |        |       |
+| | +-----+                        |        |       |
+| | | web ++                       |        |       |
+| | +----------------v[Mount Point]|        |       |
+| |        +--------->      +---------------+       |
+| | +------+                       |                |
+| | | web ++                       |                |
+| | +-----+                        |                |
+| +--------------------------------+                |
++---------------------------------------------------+
+
+
+
+
+## Amazon Storage Gateway
+##########################
+
+ - Virtual macine that you run on-premises with VMWare or HyperV
+ 		- Can also run on EC2 instances
+ - Provides local storage resources backed by AWS S3 and Glacier
+ - Often used in DR preparedness to sync to AWS
+ - Useful in cloud migrations
+
+
+New Name 		  	Old Name					Interface						Function
+-----------   	---------------   ---------------     --------------
+File Gateway		None 							NFS, SMB					Allow on-prem or EC2 instances
+																									  to store objects in S3 via
+																										NFS or SMB mount point
+
+Volume Gateway	Gateway-stored 		iSCSI						Async replication of on prem data to s3
+Stored Mode			volumes
+
+Volume Gateway	Gateway-cache			iSCSI						Primary Data stored in S3 with
+Cached Mode			volumes														frequently access data cached locally on-prem
+
+Tape Gateway	Gateway-Virtual			iSCSI						Virtual media changer and tape library
+         			Tape Library												for use with existing backup software
+
+
+## Amazon WorkDocs
+##########################
+		(like dropbox)
+	- Secure, fully managed file collaboration service
+	- Can integrate with AD for SSO
+	- HIPPA, PCI DSS and ISO compliance requirements
+	- Available SDK for creating complementary apps
+
+
+## Database on EC2
+##########################
+	- Run any database with full control  / flexibility
+	- Must manage everything like backups, redundancy, patching, scale
+	- Good option if you require a db not yet supported by RDS (i.e. DB2, SAP HANA)
+
+
+
+
+
 .
