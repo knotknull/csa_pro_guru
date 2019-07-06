@@ -410,6 +410,271 @@ Tape Gateway	Gateway-Virtual			iSCSI						Virtual media changer and tape library
 
 
 
+## Amazon RDS
+##########################
+
+	- Managed database option for MySQL, Maria, PostgreSQL, SQL Server,
+		Oracle and MySQL-compatible Aurora
+	- Best for structured, relational data store needs
+	- drop-in replacement for existing on-prem instances
+	- Automated backups and patching in customer-defined maintenance windows
+	- Push-button scaling, replication and redundancy
+
+## RDS Anti-Patterns
+
+	If you need ...										Don't use RDS, use this instead
+	-----------------									-----------------------
+	Lots of BLOB												S3
+	Automated scalability 							DynamoDB
+	Name / Value Data Structure 				DynamoDB
+	Data not well stuctured 						DynamoDB
+	Other DB (DB2, etc.)								EC2
+	Complete control over db 						EC2
+
+
+Multi-AZ RDS
+	- Read-Replicas service regional users
+
+NOTE for MySQL: non-transactional storage engines like MyISAM don't support
+                replication; you muse use InnoDB (or XtraDB on Maria)
+
+MariaDB is an open-source fork of MySQL.
+
+	NOTE:  Sync replication to Standby
+	       Aync replication to Read replica
+---------------------------------------------------
+| us-west-2																				|
+|  ------------  	sync				------------				|
+|  | Maria DB |		replication	| Maria DB |				|
+|  | Master   |  	-------->		| Standby  |				|
+|  ------------  							------------				|
+|   us-west-2a   							us-west-2a					|
+|				| 																				|
+|				| 																			  |
+--------|------------------------------------------
+				|
+				--------------------------
+			                           |
+---------------------------------|------
+| eu-central-1									 |		 |
+|  ------------  	async				   |     |
+|  | Maria DB |		replication	   |     |
+|  | Read     | <-----------------	   |
+|  | Replica  |  	                     |
+|  ------------  						           |
+|   eu-central-1a   							     |
+|																			 |
+----------------------------------------
+
+	- 1 AZ Fails
+		- Stand-by in another AZ assumes role of master
+		- Read replicas keep on working
+
+
+	- if entire region fails
+		- Read Replica promoted to Stand-Alone (Single-AZ)
+		- Single-AZ reconfigured to Mult-AZ
+
+
+
+
+## Amazon DynamoDB
+##########################
+
+	- Managed, multi-AZ NoSQL data store with Cross-Region Replication option
+	- Defaults to eventual consistency reads but can request strongly consistent
+	  read via SDK parameter
+	- Priced on throughput, rather than compute
+	- Provision read and write capacity in anticipation of need.
+	- Autoscale capacity adjusts per configured min/max levels.
+	- On-Demand Capacity for flexible capacity at a small premium cost.
+	- Achieve ACID compliance with DynamoDB Transactions
+
+
+	Relational vs. NoSQL
+
+	relational : structured
+	NoSQL : name / value pairs
+
+
+	Partition Key ==>> Primary Key (Internal Hash)
+	MUST BE UNIQUE
+  Can access via key
+
+	Composite Primary Key:  partition key + sort key i.e. OrderNum + timestamp
+	Can have multiple instances of Partition Key but sort key MUST BE DIFFERENT
+
+## Secondary Indexes
+
+Index Type					Description									How to distinguish
+-----------------   --------------------				------------------------
+Global Secondary     Partition and sortkey can		I'm not restricted to partitioning
+Index								 be different from those     of partition key.  I'm GLOBAL
+										 on table
+
+Local Secondary      Same partition as the table 	I have to stay local and respect
+Index								 but different sort key 			table partition key but I can
+																									choose sort key.
+
+- ** Max 5 local and 5 global secondary indexes
+- ** Max 20 attributes across all indexes
+- Indexes take up storage space
+
+
+
+
+## When to use Secondary Indexes
+
+Index Type					Description									    Example
+-----------------   --------------------				    ------------------------
+Global Secondary     When you want a fast query			Query Sales Orders by Customer #
+Index								 of attributes outside the      rather Sales Order $
+										 primary key - without having
+										 to do a table scan
+
+Local Secondary      When you already know the 			I have Sales ORder #
+Index								 partition key and want to      but I want to retrieve records
+										 quicky query on another        with a certain Material #
+										 attribute
+
+
+## Attribute Projections
+	- when creating an index, need to select which attributes are projected onto
+	  that index
+	- secondary index like a view
+
+	Projection:
+		- customerNum (key)
+		  - customerName
+		  - customerAddr1
+		  - salesOrderNum
+		  - timestamp
+
+
+## Secondary index use cases
+
+If you need to 						Consider				  		Cost						Benefit
+-------------- 						--------				  		-----						---------
+access just a few					Projecting just       Minimal					Lowest possible latency
+attributes the fastest    those few attr												access for non-key items
+way possible              in a global 2nd idx
+
+
+frequently access some 		Projecting those      Moderate;				Lowest possible latency
+non-key attributes        attr in a global			offset table		access for non-key items
+													secondary index				scans
+
+
+frequently access most 		Projecting those      Up to Double		Maximum flexibility
+non-key attributes        attr or even entire
+													table in global
+													secondary index
+
+rarely query but write 		Projecting keys only   Minimal 				Very fast write or
+or update frequently 			for the global 												updates for non-partition
+													secondary index 											key items.
+
+
+## Amazon Redshift
+##########################
+
+	- Fully managed, clustered peta-byte scale data warehouse
+
+	- Extremely cost-effective as compared to some other on-premise
+	  data warehouse platforms
+
+	- PostgreSQL compatible with JDBC and ODBC drivers available;
+	  compatible with most BI tools out of the box
+
+	- Features parallel processing an columnar data stores which are
+	  optimized for complex queries.
+
+Redshift Spectrum:  option to query directly from data files on S3
+
+
+
+## Data Lake
+	- Large repository of data
+	- Place tech on top to make use i.e.  ML / Analytics etc.
+			- Query raw data without extensive pre-processing
+			- Lessen time from data collection to data value
+			- Identify correlations between disparate data sets
+
+
+
+## Amazon Neptune
+##########################
+	- Fully managed graph database
+	- Supports open graph APIs for both Gremlin and SPARQL
+
+https://aws.amazon.com/neptune
+
+
+
+
+## Amazon Elasticache
+##########################
+
+	- Fully managed implementations of two popular in-memory data stores:
+			- Redis
+			- Memcached
+	- Push-button scalability for memory, writes and reads
+	- In Memory key/value store - not "traditionally persistent"
+	- Billed by node size and hourse of use
+
+   Use												Benefit
+   ----												----------
+Web Session Store					store web session info in Redis so session info not lost
+													if web server goes down
+
+Database Caching 					Use Memcached in front of AWS RDS to cache popular queries
+                          to offload work from RDS and return results faster to users
+
+Leaderboards 							Use Redis to provide a live leaderboard for millions
+                          users of mobile app
+
+Streaming Data Dashboards 	Provide a landing spot for streaming sensor data
+                          	on factory floor, real-time dashboards
+
+
+		Memcached								vs. 								Redis
+		----------																----------
+		- Simple, no frills straight forward			 - you need encryption
+		- Scale out/in as demand changes 					 - you need HIPPA compliance
+		- Run multiple CPU cores / threads 				 - Support for clustering
+		- You need to cache objects 							 - You need complex data types
+																							 - You need HA / replication
+																							 - Pub / Sub capability
+																							 - Geospatial indexing
+																							 - Backup / restore
+     Barebones									 								Fancy Options
+
+
+
+## Amazon Database Options
+##########################
+
+Database on EC2				- Ultimate control over database
+              				- Prefereed DB no available under RDS
+
+Amazon RDS    				- Need tradtional relational DB for OLTP
+              				- Your data is well-formed and structured
+
+Amazon DynamoDB    		- Name / value pair data or unpredictable data structure
+              				- In-memory performance w/ persistence
+
+Amazon Redshift    		- Massive amounts of data
+              				- Primarily OLAP workloads
+
+Amazon Neptune    		- Relationships between objects a major portion of data value
+
+Amazon Elasticache    - Fast temporary storage for small amounts of data
+              				- Highly volatile data
+
+
+
+
+
 
 
 .
