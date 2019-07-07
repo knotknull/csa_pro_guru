@@ -672,6 +672,103 @@ Amazon Elasticache    - Fast temporary storage for small amounts of data
               				- Highly volatile data
 
 
+## Exam Tips
+##########################
+
+	- Read AWS Storage Options whitepaper, NOTE: anti-patterns
+
+Know when to use various data stores:
+
+	RDS 				Traditional relational data models
+	    				Existing apps requiring RDBMS
+	    				OLTP, ACID-compliant
+
+	DynamoDB 		High I/O needs
+							Scale dynamically
+
+	S3 					BLOBs
+
+	EC2 				Database not suppported under RDS
+	    				Need complete control
+
+	Redshift 		OLAP
+
+Resources:
+		AWS Whitepapers
+		re:Invent Videos
+
+Storage Options in the cloud
+https://d1.awsstatic.com/whitepapers/Storage/AWS%20Storage%20Services%20Whitepaper-v9.pdf
+
+Multi-Tenant SaaS Storage Strategies
+https://d1.awsstatic.com/whitepapers/Multi_Tenant_SaaS_Storage_Strategies.pdf
+
+Perfromance as Scale with Amazon Elasticache
+https://d0.awsstatic.com/whitepapers/performance-at-scale-with-amazon-elasticache.pdf
+
+Video: Deep Dive on Amazon S3 and Glacier Storage Management
+https://www.youtube.com/watch?v=SUWqDOnXeDw
+
+Video: Deep Dive on Amazon Relational Database Service
+https://www.youtube.com/watch?v=TJxC-B9Q9tQ
+
+Video: ElastiCache Deep Dive: Best Practies and Usage Patterns
+https://www.youtube.com/watch?v=_YYBdsuUq2M
+
+Video: Using Hybrid Storage with AWS Storage Gateway to Solve On-Premise Storage Problems
+https://www.youtube.com/watch?v=9wgaV70FeaM
+
+
+## Pro Tips - Storage
+##########################
+
+	- Archiving and Backup often great "pilot" to build AWS case
+	- Make use of the S3 endpoints within your VPC
+				- attach S3 endpoint to VPC
+	- Learn how to properly secure your S3 bucket
+	- Encrypt!!!
+	- Consider Aurora for you production MySQL/Maria or PostgreSQL needs
+	- Consider NoSQL if you don't need relational databases
+	- Databases on EC2 cost less on the surface than RDS
+			- remember costs of management (backups, pathing, OS-level hardening)
+	- There can be a performance hit when RDS backups run if you only
+	  have a single AZ instance.
+
+## Lab Storage
+https://github.com/ACloudGuru-Resources/Course_Certified_Solutions_Architect_Professional/tree/master/lab-storage
+
+registry.opendata.aws
+
+openaq
+Resource type
+    S3 Bucket
+Amazon Resource Name (ARN)
+    arn:aws:s3:::openaq-fetches
+
+Athena works with JSON file
+
+https://openaq-fetches.s3.amazonaws.com/index.html
+
+
+1. Use AWS Glue
+	- create crawler
+	s3://openaq-fetches/realtime/2018-10-09
+
+
+
+
+What city had the highest average ozone (O3) reading on October 9, 2018?
+
+
+
+
+
+
+
+
+
+
+
 
 
 
