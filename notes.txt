@@ -755,16 +755,227 @@ https://openaq-fetches.s3.amazonaws.com/index.html
 	s3://openaq-fetches/realtime/2018-10-09
 
 
-
-
 What city had the highest average ozone (O3) reading on October 9, 2018?
 
 
 
 
+###################################################################################################
+## Networking
+###################################################################################################
+
+Refresher:
+	- Physical layout of AZs and Regions
+	- VPC concept and how to create
+	- Create private and public subnets
+	- What a NAT is and what "Disable Source/Destination Check"   << WHAT IS THIS ??
+									a NAT instance must be able to send and receive traffic
+									when the source or destination is not itself. Therefore,
+									you must disable source/destination checks on the NAT instance
+	- Route table and routing terminology (default routes, local routes)
+	- IPv4 Addressing and Subnet Mask Notation (/14, /24, etc)
+	- Intermediate Networking Terminology: MAC address, port, gateway, router
+
+## OSI Model:
+
+Layer						Name							Example											Mnemonic
+-----						-----							---------										-------------
+ 7							Application				Web Browser										Away
+ 6							Presentation			TLS/SSL, Compression 					Pizza
+ 5							Session						Setup, Negotiation, Teardown 	Sausage   ^
+ 4							Transport					TCP 													Throw     | Customer
+ 3							Network						IP, ARP 											Not      	| Responsibility
+ ---------------------------------------------------------------------------------------
+ 2							Data Link					MAC														Do				| AWS
+ 1							Physical 					CAT5, fiber, 5GHZ							Please		v Responsibility
+
+
+Multicast not allowed in AWS
+
+Unicast: like a phone call
+Multicast: Loudspeaker (MAC address level)
+
+## TCP vs. UDP vs ICMP
+
+Layer 4 Protocol		Characteristics							Plain Speak							Uses
+----------------    ---------------							-----------             -----
+ TCP 								Connection-based,						After everything I say	Web, Email, FTP
+                    stateful, ack receipt				I want you to confirm
+
+ UDP								Connectionless, 						I'm going to talk and		Streaming, DNS
+ 									  stateless, simple no			  its ok if you miss
+ 									  retransmission delays 			some words
+
+ ICMP								Used by network devices, 		We routers can keep 		traceroute, ping
+										to exchange info						in touch about network
+																								health in our own language
+
+
+## Ephemeral Ports
+	- Short-lived transport protocol ports used in IP communications
+	- Above the "well-known" IP ports (above 1024)
+	- Dynamic Ports
+	- Suggested range is 49152 to 65535
+		- Linux kernels generally use 32568 to 61000
+		- Windows platforms default from 1025
+	- NACL and Security Group implications
+
+
+## AWS Availability Zones
+	- The Physical to Logical assignment of AZ's is done at Account Level
+	 	i.e. Account 10's US-WEST-2A might not be same Physical data center as
+		     Account 22's US-WEST-2A !!
+
+		- Does this to balance load across data centers
+
+
+## Network to AWS Connectivity
+###############################
+Amazon Global Network
+
+AWS re:Invent 2016 Amazone Netowrk Overview by James Hamilton
+https://www.youtube.com/watch?v=uj7Ting6Ckk
+
+- AWS Managed VPN
+- AWS Direct Connect
+- AWS Direct Connect + VPN
+- AWS VPN CloudHub
+- Software VPN
+- Transit VPC
+
+
+## AWS Managed VPN
+#####################
+What: 	AWS managed IPsec VPN connection over your existing internet
+
+When: 	Quick and usually simple way to establish a secure tunneled connection
+      	to a VPC; Redundant link for Direct Connect or other VPC VPN
+
+Pros: 	Supports static routes or BGP peering and routing
+
+Cons: 	Dependent on your Internet connection
 
 
 
+## AWS Direct Connect
+#####################
+
+What: 	Dedicated network connection over private lines straight into AWS backbone
+
+When: 	Require a "big pipe" into AWS; lots of resources and services being
+      	provided on AWS to you corporate users
+
+Pros: 	More predictable network performance; potential bandwidth cost reduction;
+				up to ** 10 Gbps provisioned connections; Supports BGP peering and routing
+
+Cons: 	May require additional telecom and hosting provider relationships and/or
+ 				new network circuits
+
+How: 		Work with your existing Data Network Provider; Create Virtual Interfaces
+        (VIF) to connect to VPCs (private VIF) or other AWS service like S3
+				or Glacier (public VIF)
+
+## AWS Direct Connect Plus VPN
+###############################
+
+What: 	IPSec VPN connection over private lines
+
+When: 	Want added security of encrypted tunnel over Direct Connect
+
+Pros: 	More secure (in theory) than Direct Connect alone
+
+Cons: 	More complexity introduced by VPN layer
+
+How: 		Work with your existing Data Networking Provider
+
+
+
+
+## AWS VPN CloudHub
+###############################
+
+What: 	Connect locations in a Hub and Spoke manner using AWS Virtual Private Gateway
+
+When: 	Link remote offices for backup or primary WAN access to AWS resources
+				and each other
+
+Pros: 	Reuses existing Internet connection; Supports BGP routes to direct
+				traffic (i.e. use MPLS first then CloudHub VPN as backup)
+
+Cons: 	Dependent on Internet connection; No inherent redundancy
+
+How: 		Assign multiple Customer Gateways to a Virtual Private Gateway,
+				each with their own BGP ASN and unique IP ranges
+
+
+## Software VPN
+###############################
+
+What: 	You provide your own VPN endpoint and software
+
+When: 	You must manage both ends of the VPN connection for compliance
+				reasons or you want to use a VPN option not supported by AWS
+
+Pros: 	Ultimate flexibility and manageability
+
+Cons: 	You must design for any needed redundancy across the whole chain.
+
+How: 		Install VPN software via Marketplace appliance or on an EC2 instance
+
+
+## Transit VPC
+###############################
+
+What: 	Common strategy for connecting geographically disperse VPCs and
+				locations in order to create a global network transit center
+
+When: 	Locations and VPC-deployed assets across multiple regions that need to
+				communicate with one another
+
+Pros: 	Ultimate flexibility and manageability but also AWS-managed VPN
+				hub-and-spoke between VPCs
+
+Cons: 	You must design for any needed redundancy across the whole chain.
+
+How: 		Providers like Cisco, Juniper Networks and Riverbed have offerings
+				which work with their equipment and AWS VPC.
+
+
+
+###################################################################################################
+## Fundamentals:  Subnets & CIDR
+###################################################################################################
+
+     		Network			Host 									Hosts per
+Class		Range				Range			Networks		Network
+  A          0 . 0.0.0
+           127 . 255.255.255		 128			 16,777,216
+  B        128.0 . 0.0
+        191.255  . 255.255		 	16,384 		     65,536
+  C      192.0.0 . 0
+    223.255.255  . 255		 			2,097,152 		  256
+
+
+
+Class 				Private Subnet Range 					Subnet Mask
+  A							10.0.0.0										255.0.0.0
+  B							172.16.0.0									255.255.0.0
+  C							192.168.0.0									255.255.255.0
+
+
+## CIDR:  Classless Inter-Domain Routing
+
+ex.   10.0.1.0/24
+
+divided into two subnets =
+
+	10.0.1.0/25     (127 hosts)   10.0.1.1   - 127
+	10.0.1.128/25   (126 hosts)   10.0.1.128 - 254
+
+
+VPC:  			10.0.1.0/24
+	subnet 1: 10.0.1.0/25
+	subnet 2: 10.0.1.128/25
 
 
 
