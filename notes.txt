@@ -829,7 +829,7 @@ Layer 4 Protocol		Characteristics							Plain Speak							Uses
 		- Does this to balance load across data centers
 
 
-## Network to AWS Connectivity
+## Network to VPC Connectivity
 ###############################
 Amazon Global Network
 
@@ -979,8 +979,222 @@ VPC:  			10.0.1.0/24
 
 
 
+## VPC to VPC Connectivity
+###############################
+
+ - VPC Peering
+ - Software VPN
+ - Software to AWS Managed VPN
+ - AWS Managed VPN
+ - AWS Direct Connect
+ - AWS PrivateLink
 
 
+
+## VPC Peering
+###################
+
+What: 	AWS-provided network connectivity between two VPCs
+
+When: 	Multiple VPCs need to communicate or access each others resources
+
+Pros: 	Uses AWS backbone without touching the Internet
+
+Cons: 	If A connect to B and B connected to C, A cannot talk to C via B.
+        (transitive peering not supported)
+
+How: 		VPC Peering request is made; Accepter accepts request (either within
+ 				Account or across Accounts)
+NOTE: Connecting VPCs together
+
+## AWS PrivateLink
+###################
+
+What: 	AWS-provided network connectivity between VPCs and/or AWS services
+				using interface endpoints
+
+When: 	Keep Private subnets truly private by using the AWS backbone to reach
+				other services rather than the public Internet
+
+Pros: 	Redundant: uses AWS backbone
+
+Cons: 	As of October 2018, VPC endpoints can be accessed over inter-region VPC peering
+
+How: 		Create Endpoint for needed AWS or Marketplace service in all needed subnets;
+				access via thhe provided DNS hostname
+NOTE: Connecting services together via VPC endpoints
+
+
+## VPC Endpoints
+###################
+
+	- Two types of endpoints:  Interface and Gateway endpoint
+										Interface								Gateway
+										Endpoint								Endpoint
+										----------							----------
+What					Elastic Network Interface 		A gateway that is a target for a
+						  with a Private IP							specific route
+
+How							Uses DNS entries to					Uses prefix lists in the route table
+								redirect traffic						to redirect traffic
+
+What Products		API Gateway, Cloud Formation,			Amazon S3, DynamoDB
+								CloudWatch, etc.
+
+Securing				Security Groups 								VPC Endpoint Policies
+
+
+## Internet Gateways
+#####################
+	- Internet Gateway
+	- Egress-Only Internet Gateway
+	- NAT Instance
+	- NAT Gateway
+
+
+## Internet Gateway
+	- Horizontally scaled, redundant and highly available component that allows
+	  communication between your VPC and the Internet
+	- No availability risk or bandwidth constraints
+	- If your subnet is associated with a route to the Internet, that it is a
+		public subnet
+	- Supports IPv4 and IPv6
+
+	Purpose 1: Provide route table target for Internet-bound traffic
+	Purpose 2: Perform NAT for instances with public IP addresses
+		NOTE: DOES not perform NAT for instances with private IP's only
+
+
+## Egress-Only Internet Gateway
+	- Used for IPv6 addresses only
+	- IPv6 addresses are globally unique and are public by default.
+	- Provides outbound Internet access for IPv6 addressed instances
+	- Prevents inbound access to those IPv6 instances
+	- Stateful - forwards traffic from instance to internet and then sends back
+	  the response
+	- Must create a custom route for ::/0 to the Egress-Only Internet Gateway
+	- Use Egress-Only Internet Gateway instead of NAT for IPv6
+
+
+## NAT Instance
+	- EC2 instance from a special AWS-provided AMI
+	- Translate traffic from many private IP instance to a single public IP and back
+	- Doesn't allow public Internet connections into private instances
+	- Not supported for IPV6 (use Egress-Only Gateway)
+	- NAT Instance must live on a public subnet with route to Internet Gateway
+	- Private instances in private subnet must have route to the NAT instance,
+	   usually the default route destination of 0.0.0.0/0
+
+
+## NAT Gateway
+	- Fully-managed NAT service that replaces need for NAT Instances on EC2
+	- Must be created in a Public subnet
+	- Uses and Elastic IP for public IP for the life of the Gateway
+	- Private instances in private subnet must have route to the NAT instance,
+	  usually the default route destination of 0.0.0.0/0
+	- Created in specified AZ with redundance for that zone
+	- For multi-AZ redundancy, create NAT Gateways in each AZ with routes for
+	  private subnets to use the local Gateway
+	- Up to ** 5Gbps bandwidth that can scale up to 45 Gbps
+	- Can't use a NAT Gateway to access VPC peering, VPN or Direct Connect, include
+		specific routes to those in your route table (remember most specific route
+		  is selected first)
+
+
+								NAT Gateway												NAT Instance
+								------------ 											-------------
+Availability		Highly available within AZ				On your own
+Bandwidth				Up to ** 45 5Gbps									Depends on bandwidth of instance type
+Maintenance			Managed by AWS										On your own
+Performance			Optimized for NAT 								Amazon Linux AMI configured to perform NAT
+Public IP				Elastic IP that    								Elastic IP that can be detached
+                can not be detached
+Security Groups	 Cannot be associated with				Can use Security Groups
+								 NAT Gateway (?)
+Bastion Server 	Not supported 										Can be used as a bastion server
+
+
+## Routing
+#####################
+
+VPC Context
+	- Route Tables
+	- Border Gateway Protocol
+
+Route 53 Context
+	- Routing Policies
+
+Elastic Load Balance Context
+	- Request Routing
+
+
+## Routing Tables
+	- VPCs have an implicit router and main routing table
+	- You can modify the main routing table or create new tables
+	- Each route table contains a local route for the CIDR block
+	- Most specific route for an address wins
+
+		Destination								Target
+		-----------								-------
+		10.0.0.0/16								local
+		192.168.0.0/24 						vpg-xxxxxxxxxxx     << VPN Gateway
+		0.0.0.0./0 								nat-xxxxxxxxxxx     << NAT Gateway
+*		pl-xxxxxxxxxxx     				vpce-xxxxxxxxxxx    << VPC Endpoint (PrivateLink)
+
+* prefix list is a predefined mapping of all IP addresses that make up service endpoint
+
+
+		Ex. Address							Target
+		10.0.45.34							local
+		64.56.34.1							nat-xxxxxxxxxxx
+		192.168.0.7							vpg-xxxxxxxxxxx
+		Resolved IP
+		address of S3						vpce-xxxxxxxxxxx
+		10.0.255.255						<null> Broadcast address on 10.0.0.0. Not supported by VPC
+
+
+## Border Gateway Protocol
+	- Popular routing protocol for the Internet
+	- "Propogates" information about the network to allow for dynamic routing
+	- Required for Direct Connect and optional for VPN
+	- Alternative of not using BGP with AWS VPC is static routes
+	- AWS supports BGP community tagging as a way to control traffic scope and
+	  route performance
+	- Requirted TCP port 179 + ephemeral ports
+	- Autonomous System Number (ASN) = Unique endpoint identifier
+	- Weighting is local to the router and higher weight is preferred path for
+		outbound traffic
+
+
+## Enhanced Networking
+#######################
+	- Generally used for High Performance Computing use-cases
+	- Uses single root I/O virtualization (SR-IOV) to deliver higher performance
+		than traditional virtualized network interfaces
+	- Might have to install driver if other than Amazon Linux HVM AMI
+	- Intel 82599 VF Interface
+			- 10 Gbps
+	- Elastic Network Adapter
+			- 10 Gbps
+
+
+## Placement Groups
+#######################
+				Clustered															Spread
+				-------------													-------------
+What 		Instances are placed into 						Instances spread across
+				low-latency group within a 						underlying hardware
+				single AZ
+
+When 		Need low network latency and/or				Reduce risk of simultaneous failure
+				high network throughput								if underlying hardware fails
+
+Pros		Get the most out of 									Can span multiple AZ's
+				Enhanced Networking instances
+
+Cons		Finite capacity: recommend						** Max of 7 instances running
+				launching all you might need					per group per AZ
+				up front
 
 
 
