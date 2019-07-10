@@ -1021,7 +1021,7 @@ Pros: 	Redundant: uses AWS backbone
 Cons: 	As of October 2018, VPC endpoints can be accessed over inter-region VPC peering
 
 How: 		Create Endpoint for needed AWS or Marketplace service in all needed subnets;
-				access via thhe provided DNS hostname
+				access via the provided DNS hostname
 NOTE: Connecting services together via VPC endpoints
 
 
