@@ -1179,7 +1179,6 @@ Elastic Load Balance Context
 
 
 ## Placement Groups
-#######################
 				Clustered															Spread
 				-------------													-------------
 What 		Instances are placed into 						Instances spread across
@@ -1197,6 +1196,105 @@ Cons		Finite capacity: recommend						** Max of 7 instances running
 				up front
 
 
+## Route 53
+############
+	- Register domain names
+	- Check the halth of your domain resources
+	- Route internet traffic for your domain
 
+	Should know
+	- What a DNS is
+	- DNS record types: A, CNAME, MX, TXT
+				A:  	 host address
+				ALIAS: auto resolved alias
+				CNAME: canonical name for an alias
+				MX: 	 mail exchange
+				TXT: 	 descriptive text
+	- Route 53 Concepts (alias, hosted zone, etc)
+	- Why called Route 53 (reference TCP/UDP port for DNS server requests: 53)
+
+# Route 53 Routing Policies
+
+Policy							Route 53 Action
+--------						----------------
+Simple							Here is detination for that name
+Failover						Route to failover because health check on Primary is down
+Geolocation					You're in europe, route you to the closer resource
+Geoproximity				You're closer to US-EAST-1, route there instead of US-WEST-1
+Latency							Which resource has lower latency
+Multivalue Answer		Return serveral IP addreses, like a load balancer
+Weighted						Setup multiple records, and route accoring to % or weight assigned
+
+
+NOTE: Bias on geoproximity record (positive +99, negative -99)
+		- positive bias increases geoproximity circle
+		- negative bias decreases geoproximity circle
+
+NOTE: Multivalue Answer:  multiple IP addresses point to same CNAME
+
+NOTE: Weighted routing values can be from ** 0 - 255
+				0 disables traffic to that endpoint (i.e. blue green deployment)
+
+					% of Traffic = Weight for a specific record / Sum of all weights all records
+
+
+
+## CloudFront
+################
+
+	- Distributed content delivery service for simple static asset caching up to
+	  4k live and on-demand video streaming
+
+	- Understand how to create CloudFront distribution and understand edge location
+
+	- Integrated with Amazon Certificate Manager and supports SNI (Server Name Indication)
+
+## SSL TLS SNI
+
+	Want at least TLS v1.2
+
+	SNI (Server Name Indication): Client asks for which host to connect to and server
+	  	offers multiple certificates on same IP.  (Few old browsers don't support)
+
+	Security Policy:
+			- TLSv1
+			- TLSv1_2016
+			- TLSv1.1_2016
+			- TLSv1.2_2018
+
+
+
+## Elastic Load Balancer
+###########################
+
+	- Distributes inbound connections to backend endpoints
+	- Three options:
+				- Application Load Balancer (Layer 7)
+				- Network Load Balancer (Layer 4)
+				- Classic Load Balancer (Layer 4 or 7)
+	- Used for public / private workloads
+
+													Application LB			Network LB			Classic LB
+													---------------			---------- 			------------
+Protocols									HTTPS, HTTP						TCP 					TCP, SSL, HTTP, HTTPS
+Path or host-based						YES								NO								NO
+  Routing
+SSL Off Loading								YES								NO								YES
+SNI														YES								NO								NO
+Sticky Sessions								YES								NO								YES
+Static IP/ Elastic IP					NO								YES								NO
+User Authentication						YES								NO								NO
+
+
+## Application Load Balancer
+
+	Routes login.acme.com/customer to different Target Group vs.
+	       login.acme.com/vendor
+
+## Network Load Balancer
+	- Excel at speed
+
+## Sticky Sessions
+	- Identifies which client is assigned which server.
 
 .
