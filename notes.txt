@@ -1199,7 +1199,7 @@ Cons		Finite capacity: recommend						** Max of 7 instances running
 ## Route 53
 ############
 	- Register domain names
-	- Check the halth of your domain resources
+	- Check the health of your domain resources
 	- Route internet traffic for your domain
 
 	Should know
@@ -1217,18 +1217,18 @@ Cons		Finite capacity: recommend						** Max of 7 instances running
 
 Policy							Route 53 Action
 --------						----------------
-Simple							Here is detination for that name
+Simple							Here is destination for that name
 Failover						Route to failover because health check on Primary is down
-Geolocation					You're in europe, route you to the closer resource
+Geolocation					You're in Europe, route you to the closer resource
 Geoproximity				You're closer to US-EAST-1, route there instead of US-WEST-1
 Latency							Which resource has lower latency
-Multivalue Answer		Return serveral IP addreses, like a load balancer
-Weighted						Setup multiple records, and route accoring to % or weight assigned
+Multivalue Answer		Return several IP addresses, like a load balancer
+Weighted						Setup multiple records, and route according to % or weight assigned
 
 
-NOTE: Bias on geoproximity record (positive +99, negative -99)
-		- positive bias increases geoproximity circle
-		- negative bias decreases geoproximity circle
+NOTE: Bias on geo-proximity record (positive +99, negative -99)
+		- positive bias increases geo-proximity circle
+		- negative bias decreases geo-proximity circle
 
 NOTE: Multivalue Answer:  multiple IP addresses point to same CNAME
 
@@ -1296,5 +1296,17 @@ User Authentication						YES								NO								NO
 
 ## Sticky Sessions
 	- Identifies which client is assigned which server.
+
+
+
+
+
+
+
+
+
+
+
+
 
 .
