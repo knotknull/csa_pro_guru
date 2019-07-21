@@ -1299,6 +1299,92 @@ User Authentication						YES								NO								NO
 
 
 
+## Exam Tips
+###########################
+VPCs:
+ - Know pros and cons of each On-prem AWS Connection mode
+ - Know the functions of the different VPC components
+ 		- Customer GW
+ 		- Virtual Private GW
+ - Know that Direct Connect is not inherently redundant
+ 		- Know how to architect a network that is (VPN, 2ndary direct connect )
+ - Multicast and Broadcast aren't supported in VPCs
+ - Know what is meant by stateless, stateful, connectionless and
+   connection-based in terms of IP protocols
+ - Know what ephemeral ports are and why they might be needed in a NACL or SG
+
+Routing:
+ - Understand BGP and how to use weighting to shift network traffic
+ - Know how routes in a route table are prioritized (most specific wins)
+ - What other routing protocols does AWS support (none, only BGP )
+
+VPC Peering:
+ - CIDR ranges cannot overlap.
+ - After VPC owner accepts a peering request, routes must be added to
+   respective route tables
+ - Transitive peering is not supported, but mesh or hub and spoke are, with
+   proper NACLs and routes
+ - A Transit VPC is supported
+
+Internet Gateways:
+ - Difference between NAT Instance and NAT GW
+ - Internet GWW is horizontally scaled, redundant with no bandwidth constraints
+ - NATs do have bandwidth contraints but..
+ - VPCs can have multiple NATs across AZs and subnets for scale -
+   so long as routes are defined properly
+ - Use Egress-Only Gateway for IPv6
+
+Route 53:
+ - Understand different types of routing policies and use cases.
+ - Know the Weighted Routing Formula
+ - Route 53 is a global service
+
+CloudFront:
+ - Understand what must happen to use a custom domain with CloudFront
+ - Understand what SNI enables and the necessary alternative
+
+Elastic Load Balancer:
+ - Know the three different types of Load Balancers and  at which OSI Layer they work
+ - Understand which major features each deliver ( protocol, SNI Sticky Sessions)
+ - Know what sticky sessions are and when they come into play.
+
+
+## Pro Tips
+###########################
+
+ - Direct Connect may be a more complex and costlier option to setup, but it
+   could save big on bandwidth costs
+ - Explicitly deny as must traffic as you can with NACLs and SG
+ 		- Principle of Least Privilege
+ - Think through your VPC layout (see 2017 re:Invent video "Networking May VPCs:
+    Transit and Shared Architecture")
+ -  You can use Route 53 for your domain even if AWS isn't your registrar.
+ -  ELBs provide a useful layer of abstraction (as does Route 53 too)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ -
+
+
+
+
+
+
+
+
 
 
 
