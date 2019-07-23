@@ -1298,6 +1298,14 @@ User Authentication						YES								NO								NO
 	- Identifies which client is assigned which server.
 
 
+Use these addresses from NLB back to on-prem:
+10.0.0.0/8
+172.16.0.0/12
+192.168.0.0/16
+100.64.0.0/10
+RFC 1918 / RFC 6598
+
+NLB gets assigned Single IP Addr for each AZ
 
 ## Exam Tips
 ###########################
@@ -1348,6 +1356,14 @@ Elastic Load Balancer:
  - Understand which major features each deliver ( protocol, SNI Sticky Sessions)
  - Know what sticky sessions are and when they come into play.
 
+Connecting Many VPCs:
+https://www.youtube.com/watch?v=KGKrVO9xlqI
+
+Amazon VPC Network :
+https://www.youtube.com/watch?v=8gc2DgBqo9U
+
+Deep dive into the New Network Load Balancer :
+https://www.youtube.com/watch?v=z0FBGIT1Ub4
 
 ## Pro Tips
 ###########################
@@ -1364,6 +1380,14 @@ Elastic Load Balancer:
 
 
 
+
+
+
+
+
+###################################################################################################
+## Security
+###################################################################################################
 
 
 
