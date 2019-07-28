@@ -1384,10 +1384,133 @@ https://www.youtube.com/watch?v=z0FBGIT1Ub4
 
 
 
-
 ###################################################################################################
 ## Security
 ###################################################################################################
+
+## Concepts
+###########################
+
+Shared Responsibility Model
+		- Customer:  Platform, App, OS, IAM, Client Data, Encryption, etc.
+		- AWS: Compute, Storage, DB, Networking, Regions, AZ, Edge locations
+
+
+Principle of Least Privilege
+	- Give user only access they need, only when they need it.
+
+
+Security Facet 			Description   							AWS Example
+--------------      --------------- 						------------------
+Identity						Who you are?								Root Account User, IAM User
+																								Temp Security Credentials
+
+Authentication			Prove that you are you			Multi-factor Authentication
+																								Client-side SSL Certificate
+
+Authorization				Are you allowed to do this 	IAM Policies
+
+Trust 							Do other entities that I 		Cross-Account Access,
+      							trust say they trust you?		SAML-based Federation,
+      																					Web Identity Federation
+
+
+
+## Identity Providers / Identity Brokers
+
+							+-----------------------------------------------+
+              |                                               |     +--------------------+
+              |                                               |     | +----+   +-----+   |
+              |            Identity Store (Directory)         |     | |    |   |     |   |
+              |     ID          Secret        Privileges      |     | +----+   +-----+   |
+              |    sue          xxx             111           |     |                    |
+              |    joe          yyy             222           |     |  +-------------+   |
+              |    root         zzz             234           |     |  +-------------+   |
+              |                                               |     +--------------------+
+              |                  |         ^                  |         Service Providers
+ Identity     |                  |         |                  |
+ Providers    |                  v         |                  |               ^
+              |           +---------------------------+       |               |
+ [facebook]   |           |                           |       |               | (key)
+              | +------>  |                           |       |               |
+ [google]     |Federation |                           | +---> |       +---------------+
+              | <------+  |                           | (key) |       +---------------+
+ [cognito]    |           |                           |       |
+              |           |                           | <---+ |       +---------------+
+              |           |                           |       |       +---------------+
+              |           +---------------------------+       |
+              |                  Identity Broker              |       +---------------+
+              |                                               |       +---------------+
+              +-----------------------------------------------+						 Identities
+                     Identity Provider
+
+
+
+## Authentication Flow
+
+Service Provider                     User Agent                Identity Provider
+----------------                     ----------                -----------------
+   | <----- Give Me Access ----------   |                                    |
+   |                                    |                                    |
+	 | ---- Go ask Identity Provider ---> |                                    |
+   |                                    |                                    |
+   |                                    | --I Was sent by Service Provider-> |
+   |                                    |                                    |
+   |                                    | <---- Authentication Please -----  |
+   |                                    |                                    |
+   |                                    | --- Here is my authentication -->  |
+   |                                    |                                    |
+   | <--- Let this person in, they check out ------------------------------  |
+   |                                    |                                    |
+	 | ----------- Come on in ----------> |                                    |
+   |                                    |                                    |
+
+
+
+## SAML vs. OAuth vs. OpenID
+
+SAML 2.0
+	- can handle authorization and authentication
+	- XML-based protocol
+	- Can contain: user, group memebership an other info
+	- Assertions in the XML for authentication, attributes or authorization
+	- Best Suited for Single Sign-on for Enterprise users
+
+OAuth
+	- Allows sharing of protected assets without having to send login credentials
+	- Handles authorization (can you do it) only, not authentication (who are you)
+	- Issues token to the client
+	- Application validates token with Authorization Server
+	- Delegate access, allowing the client apps to access info on behalf of user
+	- Best suited for API authorization between apps
+
+OpenID Connect
+	- Identity layer built on top of OAuth 2.0, adding authentication
+	- Uses REST/JSON message flows
+	- Supports web clients, mobile, clients, Javascript clients
+	- Extensible
+	- Best suited for Single Sign-on for consumer
+
+
+## Compliance
+	- AWS Artifact
+	- ISO 9001, ISO 27001, ISO 27017,  ISO 27018, PCI DSS Level 1, SOC 1, SOC 2, SOC 3
+
+
+
+## Multi-Account Management
+###########################
+	- Most large orgs will have multiple AWS Accounts
+	- Segregation of duties, cost allocation, and increased agility
+	- Need methods to properly manage and maintain them.
+
+## When Should You Use Multiple Accounts?
+	- Do you require administrative isolation between workloads ?
+	- Do you require limited visibility and discoverability of workloads ?
+	- Do you require isolation to minimize "blas radius" ?
+	- Do you require strong isolation of recovery and/or auditing data ?
+
+
 
 
 
