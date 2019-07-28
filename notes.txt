@@ -1669,16 +1669,48 @@ OpenID Connect
 ## AWS Directory Services
 ###########################
 
+## Types of Directory Services Offered
+
+AWS Cloud Directory:  Cloud-native directory to share and control access to
+                      hierarchical data between applications
+            Best For: Cloud applications that need hierarchical data w/
+						          complex relationshipos
+
+Amazon Cognito :  Sign-up and sign-in functionality that scales to millions
+                  of users and federated to public social media services
+            Best For: Consumer apps or SaaS
+
+AWS Directory Service :  AWS-manged full Microsoft Active Directory
+for MS AD                (std or enterprise) running on Windows Server 2012 R2
+            Best For: Enterprises that want hosted MS AD or you need
+						          LDAP for Linux apps
+
+AD Connector   :  Allows on-premises users to log into AWS Services
+                  with their existing AD credentials. Also allows
+									EC2 instances to join AD domain.
+            Best For: Single sign-on for on-prem employees and for adding
+						          EC2 instances to the domain.
+
+Simple AD       :  Low scale, low cost AD implementation based on SAMBA
+            Best For: Simple user directory, or you need LDAP compatibility
 
 
+## AD Connector vs. Simple AD
+	AD Connector
+			- Must have existing AD
+			- Existing AD users can access AWS assets via IAM roles
+			- Supports MFA via existing RADIUS-bases MFA infrastructure
+
+	Simple AD Connector
+			- Stand-alone AD based on Samba
+			- Supports user accounts, groups, group policies and domains
+			- Kerberos-based SSO
+			- MFA not supported
+			- NO Trust Relationships
 
 
-
-
-
-
-
-
+## Credential and Access Management
+####################################
 
 
 
