@@ -1500,6 +1500,7 @@ OpenID Connect
 
 ## Multi-Account Management
 ###########################
+
 	- Most large orgs will have multiple AWS Accounts
 	- Segregation of duties, cost allocation, and increased agility
 	- Need methods to properly manage and maintain them.
@@ -1511,6 +1512,162 @@ OpenID Connect
 	- Do you require strong isolation of recovery and/or auditing data ?
 
 
+## AWS Tools for Account Management
+	- AWS Organizations
+			- hierarchy or orgs
+	- Service Control Policies
+			- policies on sub-accounts
+	- Tagging
+	- Resource Groups
+	- Consolidated Billing
+
+
+## Identity Account Structure
+	- Manage all users in Identity Account
+	- Create IAM Groups and assign users
+	- Create Cross account roles
+	- Assign roles to sub-account: business unit, env, geography
+
+  +--------------+                   +-------------+
+  |              |          -------> |  Operations |
+  | [IAM Users]  |          |        |  Account    |
+  |              |          |        | [IAM Role]  |
+  |              |          |        +-------------+
+  |              |          |
+  |              |          |        +-------------+
+  | [IAM Groups] |  ---------------> | Marketing   |
+  |              |                   | Account     |
+  |              |                   | [AIM Role]  |
+  +--------------+                   +-------------+
+
+
+## Logging Account Structure
+	- Centralized logging repo
+	- Can be secured so as to be immutable
+			- generated from sub-accounts but can't change
+	- Can use Service Control Policies to prevent
+    sub-accounts from changing logging settings
+
+
+  +-----------------+                   +-------------+
+  | Logging Account |          -------- |  Operations |
+  | Lambda          |          |        |  Account    |
+  |  ^    QuickSight|          |        | CloutdTrail |
+  |  |      |       |          |        +-------------+
+  |  |      |       |          |
+  |  |      v       |          |        +-------------+
+  | [Enterprise]    | <---------------- | Marketing   |
+  | [Logging   ]    |                   | Account     |
+  | [Buckets   ]    |                   | AWS Config  |
+  +-----------------+                   +-------------+
+
+## Publishing Account Structure
+	- Common repo for AMI's, Containers Code
+	- Permits sub-accounts to use pre-approved standardized services or assets
+
+  +---------------------+                   +-------------------+
+  | Publishing Account  |                   |  Operations Acct  |
+  | [Service Catalog]   |                   |                   |
+  |                     |          |------> |   EC2 Instances   |
+  |     [EC2 AMIs]      | ----------        +-------------------+
+  |                     |
+  | [Elastic Container] |                   +---------------------+
+  | [Registry         ] | ------------      | Marketing Acct      |
+  |                     |            |      |                     |
+  |                     |            -----> | [Docker Container]  |
+  |   [CodeCommit]      | -------|          |                     |
+  |                     |        ---------> |  Developers         |
+  +---------------------+                   +---------------------+
+
+
+
+## Information Security Account Structure
+  - Hybrid of consolidated security and logging
+  - Allows one point of control and audit
+  - Logs cannot be tampered with by sub-account users
+
+
+## Central IT Account Structure
+  - IT can manage IAM Users and groups while assigning
+	  to sub-account roles
+  - IT can provide shared services and standardized assets
+	  (AMI's, databases, EBS, etc.) that adhere to corportate policy
+
+
+  +---------------------+                   +-------------------+
+  | Central IT Account  |                   |  Operations Acct  |
+  |                     |                   |  [Biz unit data]  |
+  |                     |            |----> |   Admin Role      |
+  |   [IAM Users]       | -----|-----        +-------------------+
+  |                     |      |
+  |                     |      |            +---------------------+
+  |  [Service Catalog]  |      |------      | Marketing Acct      |
+  |                     |            |      |                     |
+  |                     |            -----> | [IT Approved EC2 ]  |
+  |   [EC2 AMIs]        | -------|          |                     |
+  |                     |        ---------> |  Developer Role     |
+  +---------------------+                   +---------------------+
+
+
+
+## Organization Units (Multi-Account)
+  - Consolidated billing allows for economy of scale
+	  by grouping into single invoice
+  - Consolidated security: utilize roles and federation Active Directory
+  - Service Control Policies: cascade down a tree
+			i.e. apply Service Control Policy (read-only) to Medical Equipment it
+			     gets cascaded to Medical Equipment -> Regulated and Unregulated
+  - NOTE: use Security(?) Control Policy to blacklist AWS services from
+	        being used in sub-accounts
+
+
+                                     [Root Account]
+              -----------------------------|--------------------------
+              |             |              |                         |
+ [Consolidated Billing]     |    [Consolidated Security] 		 [Holding Company]
+                            |
+                            |
+        |-------------------|----------------------|----------------------|
+        |                   |                      |                      |
+  [Consumer Products]      [Heavy Machinery] 	  [Automotive]			[Medical Equipment]
+      |                                            |                  |
+      |--[Marketing]                               |--[Americas]      |--[Regulated]
+      |                                            |                  |
+      |--[Manufacturing]                           |--[AsiaPacific]   |--[Unregulated]
+      |                                            |
+      |--[Finance ]                                |--[Africa]
+
+
+## Security Groups
+	- Virtual firewalls for individual assets (EC2, RDS, AWS Workspaces)
+	- Controls inbound / outbound traffic for: TCP, UDP, ICMP or custom protocols
+	- Port or port ranges
+	- Inbound  rules set by Source IP, Subnet, other Security Group
+	- Outbound rules set by Source IP, Subnet, other Security Group
+	- Remember ephemeral ports for Outbound if you need them.
+
+
+## Network Access Control Lists (NACLs)
+	- Additional layer of security for VPC that acts as a firewall
+	- Apply to entire subnets rather than individual assets
+	- Default NACL allows all inbound and outbound traffic
+	- NACLs are STATELESS:
+			- outbound traffic obeys outbound rules
+			- no connection maintained  (Security Groups are STATEFUL)
+	- Can duplicate or further restrict access along with Security Groups
+	- Remember ephemeral ports for Outbound if you need them
+
+## Why use SGs and NACLs
+	- NACLs provide a backup method of security if you accidentally change
+	  you SG to be too permissive
+	- NACLs cover entire subnet so users can create new instances and are
+	  still protected if they assign the incorrect SG
+	- Part of a multi-layer Least Privilege concept to explicitly allow and deny
+
+
+
+## AWS Directory Services
+###########################
 
 
 
@@ -1523,7 +1680,14 @@ OpenID Connect
 
 
 
- -
+
+
+
+
+
+
+
+
 
 
 
