@@ -1712,16 +1712,89 @@ Simple AD       :  Low scale, low cost AD implementation based on SAMBA
 ## Credential and Access Management
 ####################################
 
+ - Know what IAM is and components
+ - Users, Groups, Roles, Policies
+ - Resource-based Policies vs. Identity-Based Policies
+ - Know how to read and write policies in JSON
+ - Services -> Actions -> Resources
+
+## AWS Security Token Service
+	- Temporarily grant credential access to applications or users
+	- Can source credentials from: IAM, Active Directory, Facebook, Google
+
+                                        +----------+
+                               -------> |  Active  |
+                               |        | Directory|
+                               |        +----------+
+                               |
+                               |        +-----------+
+                +----------+   -------> |  Facebook |
++----------+    | AWS      |   |        +-----------+
+|  AWS IAM | -> | Secruity |-> |
++----------+    | Token    |   |        +-----------+
+                | Service  |   -------> | Google    |
+                +----------+            +-----------+
+
+## Amazon Cognito used for Mobile Applications
 
 
 
++----------+          +----------+
+|  Cognito | -------> |  Mobile  |
++----------+          |  Cognito |
+                      |  SDK     |
+                      +-----------+
+
+
+## Security Token Service Flow
+							+-----------------------------------------------+
+              |                                               |     +--------------------+
+              |                                               |     | +----+   +-----+   |
+              |            Identity Store (Directory)         |     | |    |   |     |   |
+              |     ID          Secret        Privileges      |     | +----+   +-----+   |
+              |    sue          xxx             111           |     |                    |
+              |    joe          yyy             222           |     +--------------------+
+              |    root         zzz             234           |     AWS Service Providers
+              |                                               |               ^
+              |                  |     ^                      |               |
+ Identity     |                  |     |                      |               |
+ Providers    |                  v     |     +----->[STS]     |               |
+              |           +----------------------+    |       |               |
+ [facebook]   |           |                      |    |       |               | (token)
+              | +------>  |                      |    |       |               |
+ [google]     |Federation |                      |    |       |               |
+              | <------+  |                      |    |(token)|       +---------------+
+ [cognito]    |  (token)  |                      |    +-------------> |               |               ||
+              |           |                      |            |       |  Applications |
+              |           |                      | <----------|       |               |
+              |           +----------------------+            |       +---------------+
+              |                  Identity Broker              |
+              |                                               |
+              +-----------------------------------------------+
+                     Identity Provider
 
 
 
+## Web Identity Federation Playground
+	- Authenticate with Identity Provider
+				- Amazon, Google, Facebook
+				ex. Sign in into Google, get token from STS
+				    using AssumeRoleWithWebIdentity
+
+## Token Vending Machine Concept
+	- Common way to issue temp credentials for mobile app development
+	  - Anonymous TVM: used as a way to provide access to AWS Services only,
+		                 does not store user identity
+	  - Identity TVM : used for registration and login and authorizations
+  - AWS now recommends that mobile developers use Cognito and related SDK
 
 
-
-
+## AWS Secrets Manager
+	- Store passwords, encryption keys, API keys, SSH keys, PGP keys, etc.
+	- Alternative to store passwords or keys in a "vault" (software / physical)
+	- Can access secrets via API with fine-grained access control provided by IAM
+	- Automatically rotate RDS database credentials for MySQL, PostgreSQL and Aurora
+	- Better than hard-coding credentials in scripts / applications
 
 
 
