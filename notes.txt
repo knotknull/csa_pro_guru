@@ -1899,11 +1899,41 @@ FIPS 140-2						Level 3													Level 2 / Level 3 in areas
 
 
 
-## Instruder Detection System IDS / Instruder Prevention System IPS
+## Intruder Detection System IDS / Intruder Prevention System IPS
 ##################################################################
 
+  - Intruder Detection System watches the network and systems for suspicious
+	  activity that might indicate someone trying to compromise a system
+
+  - Intruder Prevention System tries to prevent exploits by sitting behind
+	  firewalls and scanning and analyzing suspicious content for threats
+
+  - Normally comprised of a Collection / Monitoring system and monitoring agents
+	  on each system
+
+  - Logs collected or analyzed in CloudWatch, S3 or 3rd parts tools (Splunk, etc)
+		sometimes called a Security Information and Event Management system.
 
 
+		CloudWatch													CloudTrail
+		----------                         -------------
+Log events across AWS services, 			Log API activity across AWS services,
+  Think operations													Think activities
+
+Higher-level comprehensive 						More low-level granular
+ monitoring and eventing
+
+Log from multiple accounts						Log from multiple accounts
+
+Logs stored indefinitely							Logs stored to S3 or CloudWatch indefinitely
+
+Alarms history for 14 days						No native alarming; can use
+																			CloudWatch alarms
+
+
+
+## AWS Service Catalog
+#######################
 
 
 
