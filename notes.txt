@@ -1798,11 +1798,109 @@ Simple AD       :  Low scale, low cost AD implementation based on SAMBA
 
 
 
+## Encryption
+################
+
+ - Encryption At Rest
+	- Data is encrypted were it is stored: EBS, S3, RDS, or in
+	  SQS queue to be processed
+
+ - Encryption in transit
+	- Data is encrypted as it flows throught a network or process,
+	  such as SSL/TLS or HTTPS or with IPSec for VPN connections
+
+
+## Key Management Service
+
+ - Key storage, management and auditing
+ - Tightly integrated into MANY AWS services like Lambda, S3, EBS,
+   EFS, DynamoDB, SDS
+ - Import your own keys or have KMS generate them
+ - Control who manages accesses keys via IAM users and roles
+ - Audit use of keys via CloudTrail
+ - Differs from Secret Manage as its purpose-built for encryption key mgmt
+ - Validated by many compliance schemes (PCI DSS Level 1, FIPS 140-s Level 2)
+
+
+## CloudHSM
+
+ - Dedicated hardware device, single tenanted
+ - Must be within a VPC and can access via VPC peering
+ - Does not natively integrate with many AWS services like KMS
+   but rather requires custom application scripting
+ - Offload SSL from web servers, act as an issuing CA, enable TDE for
+  Oracle databases
+
+ 										"Classic" CloudHSM								Current CloudHSM
+Device 							  safeNet Luna SA										Proprietary
+Pricing			 					Upfront cost $5000							No Upfront cost/ pay per hr
+High Avail						Have to buy 2nd device					Clustered
+FIPS 140-2 						Level 2													Level 3
 
 
 
 
 
+## CloudHSM vs. KMS
+
+ 										"Classic" CloudHSM								AWS KMS
+Tenancy								Single-Tenant HSM								Multi-Teneant AWS Service
+
+Availability 					Customer managed durability			Highly available and duralbe
+											and availability								key storage and management
+
+Root of Trust					Customer managed 								AWS managed root of trust
+                      root of trust
+
+FIPS 140-2						Level 3													Level 2 / Level 3 in areas
+
+3rd Party Support			Broad 3rd party support 				Broad AWS Service Support
+
+
+
+## AWS Certificate Manager
+
+  - Manged service that lets you provision, manage, deploy public or
+	  private SSL/TLS certificates
+  - Directly integrated into many AWS Services: CloudFront, ELB and API GW
+  - Free public certificates to use w/ AWS Services.  No need to register via
+	  3rd party certificate authority
+  - can import 3rd party certificates for user on AWS
+  - Supports wildcard domains (*.domain.com) to cover all sub-domains
+  - Managed certificate renewal
+  - Can create a managed Private Certificate Authority as well for internal
+	  or proprietary apps, services or devices
+
+
+
+## Distributed Denial of Service Attacks
+#########################################
+
+# Distributed Denial of Service Attacks
+	- overwhelming requests/traffic flooding a web service
+
+# Amplification / Reflection Attacks
+	- small request / large response
+	  i.e. MONLIST NTP to a spoofed address
+
+# Application Attacks (Layer 7)
+  - HTTP GET Flood, affects http servers, DB, back-end services
+
+# Mitigating DDOS
+
+	     **	Best Practice 								AWS Service
+					-------------                 ---------------
+     Minimize Attack Surface						NACL, SGs, VPC Design
+		 Scale to absorb attack							Auto Scaling Group,  CloudFront
+		 																		Static Web Content via S3
+		 Safeguard exposed resources 				Route 53, AWS Web App Firewall, AWS Shield
+		 Learn normal behavior							AWS GuardDuty, CloudWatch
+		 Have a plan												ALL YOU
+
+
+
+## Instruder Detection System IDS / Instruder Prevention System IPS
+##################################################################
 
 
 
