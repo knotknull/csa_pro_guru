@@ -1908,11 +1908,17 @@ FIPS 140-2						Level 3													Level 2 / Level 3 in areas
   - Intruder Prevention System tries to prevent exploits by sitting behind
 	  firewalls and scanning and analyzing suspicious content for threats
 
+IPS (Intruder Prevention System) differs from an IDS
+(Intrusion Detection System) in that it can automatically
+take action on intrusions, like blacklist an offending IP address
+
   - Normally comprised of a Collection / Monitoring system and monitoring agents
 	  on each system
 
   - Logs collected or analyzed in CloudWatch, S3 or 3rd parts tools (Splunk, etc)
 		sometimes called a Security Information and Event Management system.
+
+
 
 
 		CloudWatch													CloudTrail
@@ -1934,6 +1940,278 @@ Alarms history for 14 days						No native alarming; can use
 
 ## AWS Service Catalog
 #######################
+
+	- Framework allowing administrators to create pre-defined products
+	  and landscapes for their users.
+	- Granular control over which users have access to which offerings
+	- Makes use of adopted IAM roles so users don't need underlying service access
+	- Can add or take away access to services via Service Catalog
+	- Allows end users to be self-sufficient while upholding enterprise standards
+	  for deployments
+	- Based on CloudFormation templates
+	- Admins can version and remove products.  Existing running product versions
+	  won't be shutdown.
+
+
+## AWS Service Catalog Constraints
+
+Type: Launch Constraint
+What: IAM role that Service Catalog assumes when an end-user launches a product.
+Why:  Without launch constraint, user must have all perms needed within own IAM creds.
+
+Type: Notification Constraint
+What: Specifies Amazon SNS topic to receive notifications about stack events.
+Why:  Can get notification when products are launched or have problems
+
+Type: Template Constraint
+What: One or more rules that narrow allowable values an end-user can select
+Why:  Adjust product attributes based on choices a user makes.
+      ex. Only allow certain instance types for DEV env
+			(like a wizard)
+
+## Multi-Account Scenario
+	- Can share Service Portfolio with another account
+  - Can have an "Imported Portfolio" with a local Portfolio
+  - Can add launch constraints locally
+  - Launch role in sub-account is inherited from shared portfolio (master account)
+
+
+## Exam Tips
+#######################
+
+Multi-Account Management:
+	- know different models and best practices for cross account management of security
+	- know how roles and trusts are used to create cross-account relationships and
+	  authorizations.
+
+Network Controls and Security Groups:
+	- Know difference and capabilities fo NACLs and SGs.
+	- NACLs are stateless (watch for ephemerals)
+	- Get some hands-on with NACLs and SGs to reinforce your knowledge.
+	- Remember the ephemerals
+
+AWS Directory Services:
+	- Understand the types of Directory Services offered by AWS
+     especially AD Connector and Simple AD
+	- Understand use-cases for each type of Directory Service
+	- Be familiar with how on-prem Active Directory implementation might
+	  connect to AWS and what functions that might enable.
+
+Credential and Access Management:
+	- Know IAM and its components
+	- Know how to read and write IAM policies in JSON
+	- Understand Identity Brokers, Federation and SSO
+	- Know options and stpes for temporary authorization
+
+Encryption :
+	- Know differences between AWS KMS and CloudHSM and use cases
+	- Test will likely be restricted to classic CloudHSM
+	- Understand AWS Certificate Manager and how it integrates with other AWS services
+
+DDos Attacks :
+	- Understand what they are and some best practices to limit your exposure
+	- Know some options to mitigate them using AWS services.
+
+IDS / IPS :
+	- Understand the difference between IDS and IPS
+	- Know what AWS services can help with each
+	- Understand the differences between CloudWatch and CloutTrail
+
+Service Catalog:
+	- Know that it allows users to deploy assets through inheriting rights
+	- Understand how Service Catalog can work in a multi-account scenario
+
+
+AWS Whitepapers on Security
+https://aws.amazon.com/whitepapers/#security
+
+Best Practices for Managing Security Operations on AWS
+https://www.youtube.com/watch?v=gjrcoK8T3To
+
+IAM Policy Ninja
+https://www.youtube.com/watch?v=aISWoPf_XNE
+
+Security Anti-Patterns: Mistakes to Avoid
+https://www.youtube.com/watch?v=tzJmE_Jlas0
+
+Architecting Security and Governance Across a Multi-Account Strategy
+https://www.youtube.com/watch?v=71fD8Oenwxc
+
+
+
+
+## Pro Tips
+#######################
+
+  - Know that Security will be front-of-mind for every client evaluating the
+	  cloud ... bur rarely are there sound processes in place.
+  - Acknowledge concerns and be ready with a process
+	  (Cloud Adoption Framework)
+  - Leverage assessments and checklists as illustrators of care and best-practice
+  - Migrating to the cloud is often more secure than on-prem due to increased
+	  transparency and visibility.
+  - Speak of "levels" of risk on a continuum rather than absolute.
+  - Consider AWS Certified Security Specialty or certification like CISSP
+
+
+
+
+###################################################################################################
+## Migrations
+###################################################################################################
+
+
+## Migrations  Strategies
+#########################
+
+Migration Strategy			Description 											Example
+--------------------     ------------- 										------------
+Re-Host										"Lift and Shift"								Move on-prem MySQL
+													Simply move asset with          to EC2 Instance
+													no change
+
+Re-Platform								"Lift and Reshape"							Move on-prem MySQL
+													Move assets but change					to RDS MySQL
+													underlying platform
+
+Re-Purchase 							"Drop and Shop" 								Migrate legacy on-prem
+													Drop old and purchase new				CRM system to salesforce.com
+
+Re-Architect 							Redesign application in 				Create a server-less
+													a cloud-native manner						version of legacy app
+
+Retire 										Get rid of apps which 					End of life the label
+													are not needed.									printing app because not used
+
+Retain 										"Do nothing option" 						Good news servers, you'll
+													Decide to reevaluate at a				live to see another day.
+													future date
+
+
+
+
+Migration      						Effort 							Opportunity to
+Strategy 								 (Time and Cost)			Optimize
+--------------------     --------------- 			------------
+Re-Host											**									*
+Re-Platform									****								***
+Re-Purchase									***									*
+Re-Architect 								*****								*****
+Retire 											<>									<>
+Retain 											*										<>
+
+
+## Cloud Adoption Framework
+#############################
+
+	- Business				- Platform
+	- People					- Security
+	- Governance			- Operations
+
+
+Business:
+	- Creation of a strong business case for cloud adoption
+	- Business goals are congruent with cloud objectives
+	- Ability to measure benefits (TCO, ROI)
+
+People:
+	- Evaluate org roles and structures, new skills and process needs
+	  and identify gaps
+	- Incentives and Career Management aligned with evolving roles
+	- Training options appropriate for learning styles
+
+Governance:
+	- Portfolio Management geared for determining cloud eligibility and priority
+	- Program and Project management more agile projects
+	- Align KPI's with newly enabled business capabilities
+
+Platform:
+	- Resource provisioning can happen with standardization
+	- Architecture patterns adjusted to leverage cloud-native
+	- New application development skills and processes enable more agility
+
+Security:
+	- Identity and Access Management modes change
+	- Logging and audit capabilities will evolve
+	- Shared Responsibility Model removes some and adds some facets
+
+Operations:
+	- Service monitoring has potential to be highly automated
+	- Performance management can scale as needed.
+	- Business continuity and disaster recovery takes on new methods in the cloud.
+
+
+## Hybrid Cloud Architectures
+#############################
+
+	- Hybrid Architectures make use of cloud resources along with on-premise
+	  resources
+	- Very common first step as a pilot for cloud migrations
+	- Infrastructure can augment or simply be extensions of on-prem platfoms:
+	     ex. VMWare
+	- Ideally, integrations are loosely coupled
+
+
+## Storage Gateway
+	- creates bridge between on-prem and AWS (S3 Bucket <---> Cache)
+	- Seamless to end-users
+	- Common first step into the cloud due to low rist and appealing economics
+
+
+
+                            +-----------------------------------+
+                            |AWS +---------------------+        |
+                            |    |        S3 Bucket    |        |
+                            |    +---------------------+        |
+                            +-----------------------------------+
+                                            ^
+																						|
+      +---------------------+---------------+-----+---------------------+
+			|											|											|											|
++-----+------+				+-----+------+				+-----+------+				+-----+------+
+|            |				|            |				|            |				|            |
+|   [cache]  |				|   [cache]  |				|   [cache]  |				|   [cache]  |
+|            |				|            |				|            |				|            |
+|            |				|            |				|            |				|            |
++------------+				+------------+				+------------+				+------------+
+   Corporate							Remote							  Remote							  Remote
+   HQ											Office								Office								Office
+
+## Hybrid ERP
+	- Middleware often a great way to leverage cloud services
+	- Loosely-coupled, canonical-based
+
+                            +-----------------------------------+
+  +-----+------+				    |           +->  [EC2] --+          |	                          |AWS                                |
+  |   [ERP]    |	          |           |            |          |
+  |     |      |   -------->|[SQS]-->[Update]      [DynamoDB]   |
+  |[Middleware]|---+        |        [Queue ]                   |
+  |            |            |                                   |
+  +------------+	          +-----------------------------------+
+     Corporate
+
+
+## Hybrid VMWare
+	- Scale from on-prem to AWS when needed and tear down
+	- VMware vCenter Plug-in allows transparent migration of VMs to/from AWS
+	- VMWare Cloud furthers this concept with more public cloud-native features
+
+
+
+
+## Migration Tools
+#############################
+
+
+
+
+
+
+
+
+
+
+
 
 
 
