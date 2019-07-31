@@ -2202,8 +2202,152 @@ Operations:
 ## Migration Tools
 #############################
 
+  - Storage Migration
+  - Server Migration Service
+  - Database Migration Service
+  - Application Discovery Service
+  - AWS Migration Hub
+
+## Storage Migration
+  - AWS Storage Gateway
+  - AWS Snowball
+
+## Server Migration Service
+  - Automates migration of on-premises VMware vSphere or
+	  Microsoft Hyper-V / SCVMM virtual machines to AWS
+  - Replicates VMs to AWS, syncing volumes and creating periodic AMIs
+  - Minimizes cutover downtime by syncing VMs incrementally
+  - Supports Windows and Linux VMs only (like AWS)
+  - Server Migration Connector is downloaded as a virtual appliance into your
+	  on-prem vSphere or Hyper-V setup.
+
+## Database Migration Service
+  - Data Migration Service (DMS) along with the Schema Conversion Tool (SCT)
+	  helps customers migrate databases to AWS RDS or EC2-based databases
+  - Schema Conversion Tool can copy db schemas for homogenous migrations and
+	  convert schemas for heterogeneous migrations.
+  - DMS is used for smaller, simpler conversions and supports MongoDB and DynamoDB
+  - SCT used for larger, more complex datasets like data warehouses.
+  - DMS has replication function for on-prem to AWS or to Snowball or S3.
+
+   Corporate Data Center						AWS
+  +---------------------+         +---------------------+
+	|               [SCT] |	        |                     |
+	|                 |   |    +--->|    [Redshift]       |
+	| [data     ]     v   |    |    |                     |
+	| [warehouse] ->[DMS] | ------->|    [Snowball]       |
+	|                     |    |    |                     |
+	|                     |    +--->|    [S3]             |
+	|                     |         |                     |
+  +---------------------+         +---------------------+
+
+## Application Discovery Service
+	- Gathers info about on-prem data centers to help in cloud migration planning
+	- Collects config, usage and behavior data from servers to estimate TCO of
+	   running on AWS
+	- Can run as agent-less (VMWare env) or agent-based (non-VMWare env)
+	- Only supports those OSes that AWS supports (Linux/Windows)
+	- AWS Console > AWS Migration Hub
 
 
+
+## Network Migration and Cutovers
+##################################
+
+## CIDR Reservations
+	- Ensure your IP addresses will not overlap between VPC and on-prem
+	- VPCs support IPv4 netmasks range from /16 to /28      **
+	    /16 = 255.255.0.0     = 65,024 hosts
+	    /28 = 255.255.255.240 =     16 hosts
+	- 5 Ips are reserved in every VPB subnet (ex. 10.0.0.0/24)
+	    10.0.0.0   = Network Address
+	    10.0.0.1   = Reserved by AWS for VPC Router
+	    10.0.0.2   = Reserved by AWS for Amazon DNS
+	    10.0.0.3   = Reserved by AWS for future use
+	    10.0.0.255 = VPC's don't support broadcast so AWS reserves this address
+
+## Network Migrations
+	- Most organizations start with a VPN connection to AWS
+	- As usage grows, they might choose Direct Connect but keep VPN as backup
+	- Transition from VPN to Direct connect can be seamless using BGP
+	- Once Direct Connect is setup, configure both VPN and Direct Connect
+	  within the same BGP prefix
+	- From the AWS side, the Direct Connect path is always perferred.
+	- Need to be sure the Direct Connect path is the preferred route your network
+	  to AWS and not VPN (thru BGP weighting or static route)
+
+## Amazon Snow Family
+	- Evolution of Import / Export process
+	- Move MASSIVE amounts of data to and from AWS
+	- Data transfer as fast or slow as common carrier (UPS, DHL, FedEx)
+	- Encrypted at rest
+
+
+	AWS Import / Export				Ship external HD to AWS. AWS copies to S3
+	AWS Snowball 							Ruggedized NAS in a box. Copy data up to 80TB **
+	  												and ship back.  AWS copies to S3
+	AWS Snowball Edge 				Snowball will onboard Lambda and clustering
+															Can do processing on data before shipping back
+	AWS Snowmobile 						Shipping container full of storage up to 100PB **
+														Trucks back to datacenter and copied onto S3
+
+## Migration Exam Tips
+##################################
+
+Migration Strategies:
+	- Understand different strategies (Re-host, Re-Architect, Retire)
+	- Understand trade-offs and benefits for each
+
+Cloud Adoption Framework:
+	- Know what a framework is and realistic expectations that accompany it.
+	- Understand high-level components of Cloud Adoption Framework
+			B P G P S O
+	- Cloud adoption is only partially a tech effort
+
+Hybrid Architectures:
+	- Know typical hybrid architecturs that leverage on-prem and cloud assets:
+			Storage Gateway, Hybrid ERP (messaging)
+	- Know VMWare has tools for abstracting workloads across on-prem and cloud
+	 		Import plug-in
+
+Migrations:
+	- Understand the different services / tools available for migrating servers,
+	  storage and DB: Storage , Server, DB, Migration
+
+Network Migration / Cutover:
+	- Know various hybrid networking architectures
+	- Understand transitions from / to VPN and Direct Connect can be done
+	  using BGP routing. NOTE: abrupt route changes risk downtime
+
+
+
+How to Assess Your Orgazniation Readiness to Migrate at scale to AWS
+https://www.youtube.com/watch?v=id-PY0GBHXA
+
+Migrating Databases and Data Warehouses to the Cloud
+https://www.youtube.com/watch?v=Y33TviLMBFY
+
+Deep Dive: Using Hybrid Storage with AWS Storage Gateway to Solve
+On-Premise Storage Problems
+https://www.youtube.com/watch?v=9wgaV70FeaM
+
+
+
+## Migration Pro Tips
+##################################
+
+	- Tech is often a minor part of cloud migration project
+			People, Process, Policies, External / Internal Influencers
+	- Project management discipline is a must
+	- Use Cloud Adoption Framework and alter for your company
+	- Leverage Cloud Adoption Framework to get buy-in by acknowledging the
+	  enterprise nature of cloud migrations.  Find and lean on "Champions"
+	- Span Boundaries
+
+
+###################################################################################################
+## Architecting to Scale
+###################################################################################################
 
 
 
