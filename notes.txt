@@ -2241,6 +2241,24 @@ Operations:
 	|                     |         |                     |
   +---------------------+         +---------------------+
 
+## DMS Supports
+	Source Database 					Target Database on Amazon RDS
+	----------------          --------------------------------
+	Oracle Database 					Amazon Aurora, MySQL, PostgreSQL, Oracle
+	Oracle Data Warehouse 		Amazon Redshift
+	Azure SQL 								Amazon Aurora, MySQL, PostgreSQL
+	Microsoft SQL Server 			Amazon Aurora, Amazon Redshift, MySQL, PostgreSQL
+	Teradata 									Amazon Redshift
+	IBM Netezza 							Amazon Redshift
+	Greenplum 								Amazon Redshift
+	HPE Vertica 							Amazon Redshift
+	MySQL and MariaDB 				PostgreSQL
+	PostgreSQL 								Amazon Aurora, MySQL
+	Amazon Aurora 						PostgreSQL
+	IBM DB2 LUW 							Amazon Aurora, MySQL, PostgreSQL
+	Apache Cassandra 					Amazon DynamoDB
+
+
 ## Application Discovery Service
 	- Gathers info about on-prem data centers to help in cloud migration planning
 	- Collects config, usage and behavior data from servers to estimate TCO of
@@ -2348,6 +2366,106 @@ https://www.youtube.com/watch?v=9wgaV70FeaM
 ###################################################################################################
 ## Architecting to Scale
 ###################################################################################################
+
+
+## Concepts
+##################################
+
+## Architectural Patterns
+
+Loosely Coupled Architecture:
+	- Components can stand independently and require little or no knowledge
+		of inner workings of other components
+
+		- Layers of Abstraction
+		- Permits more flexibility
+		- Interchangeable components
+		- More atomic functional units
+		- Can scale components independently
+
+NOTE: Can scale vertically / horizontally across components in a
+      loosely coupled system
+
+
+	Horizontal Scaling 												Vertical Scaling
+	Add more instances as demand increases		Add more CPU/ RAM to existing instance
+	No downtime required to scale up 					Requires restart to scale up / down
+	Automatic using Auto-scaling Groups 			Would require scripting to automate
+	Theoretically Unlimited 									Limited by instance sizes
+
+
+## Auto-Scaling Groups
+##################################
+
+	- Automatically provides horizontal scaling
+	- Triggered by an event or scaling action to launch / terminate instances
+	- Availability, Cost and System Metrics can all factor into scaling
+	- Scaling Options:
+			- Maintain:  Keep a specific or minimum number of instances running
+			- Manual  :  Use max, min or specific number of instances
+			- Schedule:  Increase / decrease instances based on schedule
+			- Dynamic:   Scale based on real-time metrics of the system
+
+## Launch Configurations
+
+	- Specify VPC and subnets for scaled instances
+	- Attache to an ELB
+	- Define a Health Check Grace Period
+	- AMI
+	- Instance
+	- Define size of group to stay at initial size.
+	- Use scaling policy which can be based from metrics
+			- Avg CPU Utilization
+			- Avg Network Bytes In / Out
+
+## Scaling Type
+Types						What														When
+Maintain		maintain X instances						I need 3 instances always
+Manual 			manually change capacity				Just manually add or remove instances
+						via console or CLI
+Scheduled 	Adjust min/max instances				Every Monday morning spin to 10
+						based on specific times
+Dynamic 		Scale in response to behavior 	When CPU util goes above 70%
+						of elements in the environment   on current instances, scale up
+
+
+
+## Scaling Policies
+Target Tracking Policy
+ 	- Scale based on a predefined or custom metric in relation to target value
+ 	- "When CPU util goes above 70% on current instances, scale up"
+
+Simple Scaling Policy
+ 	- Waits until health check and cool down period expires before evaluating need
+ 	- "Let's add new instaces slow and steady"
+
+Step Scaling Policy
+ 	- Responds to scaling needs w/ more sophistication and logic
+ 	- "Add all instances !!"
+
+
+## Scaling Cooldowns
+ 	- Configurable duration that gives scaling a change to "come up to speed"
+		and absorb load
+ 	- Default cool down period is 300 seconds (5min) **
+ 	- Automatically applies to dynamic scaling and optionally to manual scaling
+	  but not supported for scheduled scaling
+ 	- Can override default cool down via scaling-specific cool down.
+
+## Health Check Grace Period
+	- Amount of time to allow before instance is checked for it's health
+
+	After scaling event happens, amount of time to wait before instance is checked
+	for it's health
+
+
+
+
+ACG Project
+https://acloud.guru/series/acg-projects/view/107
+https://github.com/ACloudGuru/Does-Twitter-Hate-Cats
+
+
 
 
 
