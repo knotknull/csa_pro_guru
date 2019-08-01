@@ -2363,6 +2363,7 @@ https://www.youtube.com/watch?v=9wgaV70FeaM
 	- Span Boundaries
 
 
+
 ###################################################################################################
 ## Architecting to Scale
 ###################################################################################################
@@ -2460,13 +2461,103 @@ Step Scaling Policy
 
 
 
+## Kinesis
+##################################
 
-ACG Project
+## ACG Project
 https://acloud.guru/series/acg-projects/view/107
 https://github.com/ACloudGuru/Does-Twitter-Hate-Cats
 
+## Kinesis
+	- Collection of services for processing streams of data
+	- Data is processed in "shards" - with each shard able to ingest 1000 recs / sec **
+	- Default limit of 500 shards, but can request increase upto unlimited (?) **
+	- Records consists of Partition Key, Sequence Number and Data Blob (up to 1MB) **
+	- Think of as Transient Data Store - Default retention of 24 hr,
+	  can be configured for up to 7 days. **
+
+## Kinesis Video Streams
+
+## Kinesis Data Streams
+	- Ingest large quantity of data and process various ways
+			- Kinesis Data Analytics
+			- Spark on EMR
+			- Custom code on EC2
+			- Lambda
+
+## Kinesis Firehose
+	- Ingest large quantity of data and send to various landing spaces
+			- S3
+			- Redshift
+			- Amazon Elasticsearch Service
+			- Splunk
+
+## Kinesis Data Analytics
+	- Run standard SQL queries against data streams
+
+## Kinesis Data Stream Key Concepts
+	- More shards you have, more data throughput
+
+                             +---------------------------------------+
+                             |            Kinesis                    |
+                             |   (Max 1000 writes/sec per Shard)     |
+                             |      +--------------------+           |
+-------------------------->  |      |     Shard 1        |           |-----> [Consumer App]
+                             |      +--------------------+           |
+ +------+ +------+ +------+  |      +--------------------+           |
+ | Data | | Data | | Data |  |      |     Shard 2        |           |
+ +------+ +------+ +------+  |      +--------------------+           |
+                             |               .                       |
+---------------------------> |               .                       |
+                             |               .                       |
+                             |      +--------------------+           |
+                             |      |     Shard n        |           |-----> [Firehose ]
+                             |      +--------------------+           |
+                             |                                       |
+                             +---------------------------------------+
+
+NOTES:  Each shard given a partition key (128bit MD5 hash), unique to each shard
+				Each piece of data in shard gets assigned sequence number
+				Sequence numbers can be duplicated across shards
+				Can use a sequeence number within a partition key to determine if data
+				  newer than other data in that partition key
+				Uniquely identify data w/ Partition Key and Shard
+
+          +------------------------------------------------+
+          |                    Kinesis                     |
+          |                                                |
+          |  +------------------------------------------+  |
+          |  |                 Shard 1                  |  |
+          |  |Partition Key: e55f   Partition Key: e55f |  |
+          |  |Sequence No  : 1      Sequence No  : 2    |  |
+          |  |Data: <data>          Data: <data>        |  |
+          |  +------------------------------------------+  |
+          |                                                |
+          |  +------------------------------------------+  |
+          |  |                 Shard 2                  |  |
+          |  |Partition Key: 45ab   Partition Key: 45ab |  |
+          |  |Sequence No  : 1      Sequence No  : 2    |  |
+          |  |Data: <data>          Data: <data>        |  |
+          |  +------------------------------------------+  |
+          |                                                |
+          +------------------------------------------------+
 
 
+## Kinesis Stream and Fire Hose
+
+[Twitter] -> [AWS SDK] -> [Kinesis Stream] -> [Kinesis Firehose] -> [S3 Bucket]
+                                                                       |
+                                                                       v
+                                                                    [Lambda (unpack)]
+                                                                       |
+                                                                       v
+                                                                    [Dynamo DB] <-----+
+                                                                       |              |
+                                                                       v              |
+                                        [Amazon Comprehend] <--->[Lambda (sentiment)] +
+
+## DynamoDB Scaling
+####################
 
 
 
