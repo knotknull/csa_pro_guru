@@ -2558,11 +2558,83 @@ NOTES:  Each shard given a partition key (128bit MD5 hash), unique to each shard
 
 ## DynamoDB Scaling
 ####################
+                     Throughput 											Read Capacity Units
+    <---------------------------------------------->	Write Capacity Units
+                          ^
+													|
+													|
+								Size			|  - Max item size is 400KB
+													|
+													|
+													|
+                          v
+
+## DynamoDB Terminology
+
+	Partition:      A physical space where DynamoDB data is stored. 10 GB Chunks    **
+	Partition Key:  A unique identifier for each record; also called a Hash Key
+	Sort Key     :  In combo w/ partition key, optional second part of composite key
+									that defines storage order, Sometimes called a Range Key
+  - DynamoDB scales out by adding partitions
+
+## Partition Calculation
+
+	By Capacity : (Total RCU / 3000) + (Total WCU / 1000)					**
+	By Size     : Total Size / 10GB																**
+	Total Partitions:  Round Up for MAX of (By Capacity, By Size) **
+
+ex. 		10GB Table, 2000 RCU and WCU
+	By Capacity : (2000 Read RCU / 3000) + (2000 Write WCU / 2000)	**
+									2000 / 3000  + 2000 / 1000
+									0.66 + 2 = 2.66
+	By Capacity : 10GB / 10GB
+								  10 / 10 = 1
+	Total Partitions:  MAX(2.66, 1) = 2.66 >> Round Up == 3
+
+   [   Dynamo DB     ]
+   [    Partition 1  ]
+   [Hash 00xxx -FFxxx]
 
 
+   [              Dynamo DB                ]  Increase RCU/WCU or 10GB
+   [    Partition 1  ]   [    Partition 2  ]
+   [Hash 00xxx -80xxx]   [Hash 00xxx -80xxx]
+
+   [                        Dynamo DB       ]  Increase RCU/WCU or 20GB
+   [    Partition 1  ]   [    Partition 2  ]   [    Partition 3  ]
+   [Hash 00xxx -55xxx]   [Hash 56xxx -AAxxx]   [Hash ABxxx -FFxxx]
+
+NOTE:  Need a partition key that has variability in it for data increase
 
 
+ex. Sensor data over time:
+Partition Key = Date and Sort Key = sensor_id >> Hot partition on data (not spreading writes)
+Partition Key = Sensor ID and Sort Key = date >> Writes spread among partitions, and reads
 
+
+## Auto Scaling for DynamoDB
+
+        					Read Capacity											Write Capacity
+Target Utilization       ___ %                           ___ %
+Min provisioned capacity ___ Units                       ___ Units
+Max provisioned capacity ___ Units                       ___ Units
+
+                                 (3)
+[Set Autoscaling]   <--- [SNS]  <---- [ Amazon     ]
+(1) |                              +  [ CloudWatch ]
+    |                        +             |
+    |           (2)     +                  |  (4)
+    |             +                        |
+    |       +                              |
+    |+                        (5)          v
+ [DynamoDB] <-------UpdateTable------ [Application ]
+                                      [Auto Scaling]
+
+  - Using Target Tracking emthod to try to stay close to target utilization
+  - Currently does not scale down if table's consumption drops to zero
+  - Workaround 1: Send requests to the table until it auto scales down
+  - Workaround 2: Manually reduce the max capacity to match min capacity
+  - Also supports Global Secondary Indexes - think of them as a copy of table
 
 
 
