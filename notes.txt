@@ -2638,6 +2638,112 @@ Max provisioned capacity ___ Units                       ___ Units
 
 
 
+## CloudFront Part II
+######################
+
+  - Can deliver content to users faster by caching static and dynamic content
+	  at edge locations
+  - Dynamic content delivery is achieved using HTTP cookies forwarded from your origin
+  - Supports Adobe Flash Media Server's RTMP protocol but you have to choose
+	  RTMP delivery method
+  - Web distributions also support media streaming and live streaming but use
+	  HTTP or HTTPS
+  - Origins can be S3, EC2, ELB or another web server.
+  - Multiple origins can be configured
+  - Use Behaviors to configure serving up origin content based on URL paths.
+
+
+## Origins and Behaviours
+                                       wp-content/*
+                                     +------------> [Static Content / S3 Bucket]
+                                     | wp-includes/*
+[Users] -> [Route53] -> [CloudFront] +
+                                     |
+                                     +------------->  [ELB] [ASG [EC2 fleet]]
+                                      Default(*)
+                                      wp-login.php
+                                      wp-admin/*
+
+
+## Invalidate CloudFront Cache / Invalidation Requests
+	- Delete the file from the origin and wait for the TTL to expire
+	- Use AWS Console to request invalidation for all content
+	  or a specific path i.e. /images/*
+	- Use the CloudFront API to submit an invalidation request
+	- 3rd-Party tools to perform CloudFront invlalidation:
+				- CloudBerry, Ylastic, CDN Planet, CloudFront Purge Tool
+
+## Zone Apex Support
+	- CloudFront Supports Zone Apex i.e ____________.example.com
+
+## Geo-Restrictions
+	- CloudFront Supports Geo-Restrictions
+
+	Enable Geo-Restrictions:   Y / N
+	Restriction Type:   [] Whitelist  [] Blacklist
+  Countries:
+
+
+## Amazon Simple Notification Service (SNS)
+##############################################
+  - Enables a Publish / Subscribe design pattern
+  - Topics = A channel for publishing a notification
+  - Subscription = Configuring an endpoint to receive messages
+	                 published on topic
+  - Endpoint protocols include HTTP(S), Email, SMS, SQS, Amazon Device Messaging
+	          (push notification) and Lambda
+
+
+                                     +--> [SES] --> [Thank You Email]
+                                     |
+                                     |
+[Upload S3] -> [Event] -> [SNS] -> "Image Upload"  --> [SQS] -> + [Image Resize Queue]
+																	[Topic]
+                                     |
+                                     |
+                                     +--> [Lambda] -->  [Rekognition]
+
+## Amazon Simple Queue Service (SQS)
+####################################
+
+ - Reliable, highly-scalable hosted messaging queueing service
+ - Available integration with KMS for encrypted messaging
+ - Transient storage - default 4 days, max 14 days	**
+ - Optionally supports FIFO queue ordering
+ - Maximum message size of 256KB but using special Java SQS SDK, can have
+   messages as large as 2GB. (Does this by using pointers to S3)
+ - Loosely Coupled
+
+## Loosely Coupled Architecture
+
+[ERP]	                                    (polling)            (update)
+  |                                    +------------- [EC2] --------------+
+  v                                    v                                  v
+[Middleware]  ---------> [SQS] -> [Master Data ]                      [DynamoDB]
+ Corp						   AWS            [Update Queue]
+
+## Standard Queue vs FIFO Queue
+	- Standard Queue does not guarantee order
+	- FIFO maintains order messages were received
+  NOTE: if message fails or gets stuck, it will hold up
+	      all other messages behind
+
+
+
+## Amazon MQ
+#############
+  - Manged implementation of Apache ActiveMQ (message broker)
+  - Fully managed and highly available within a region
+  - Supports ActiveMQ API and support for: JMS, NMS, MQTT, WebSockets
+  - Designed as a drop-in replacement for on-prem message brokers
+  - Use SQS if creating a new application from scratch
+  - Use MQ if you want an easy path to migrate from existing message brokers to AWS 
+
+
+
+
+
+
 
 
 
