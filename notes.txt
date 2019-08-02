@@ -2737,7 +2737,71 @@ Max provisioned capacity ___ Units                       ___ Units
   - Supports ActiveMQ API and support for: JMS, NMS, MQTT, WebSockets
   - Designed as a drop-in replacement for on-prem message brokers
   - Use SQS if creating a new application from scratch
-  - Use MQ if you want an easy path to migrate from existing message brokers to AWS 
+  - Use MQ if you want an easy path to migrate from existing message brokers to AWS
+
+
+## Lambda
+#############
+
+	- Allows you to run code on-demand without need for infrastructure
+	- Supports Node.js, Python, Java, Go, C#
+	- Extremely useful option for creating serverless architectures
+	- Code is stateless and executed on an event basis (SNS, SQS, S3, DynamoDB Streams, etc.)
+	- No fundamental limits to scaling a function since AWS dynamically
+	  allocates capacity in relation to events.
+
+## Lambda Architecture
+
+
+
+                                      +--> [Dead Letter Queue]
+                                      |
+                                      |
+[Mobile Upload] -> [SQS] -> [Lambda ] +--> [Lambda: Resize] --> [S3]
+                            [Image  ] |
+                            [Receipt] +--> [Lambda: Extract Metadata] --> [DynamoDB]
+                                      |
+                                      +--> [Lambda: Send Thank You] -->  [SES
+
+## Simple Workflow Service
+###########################
+
+	- Managed Status Tracker
+	- Create distributed asynchronous systems as workflows
+	- Supports both sequential and parallel processing
+	- Tracks the state of you workflow which you interact
+	  and update via API
+	- Best suited for human-enabled workflows like order fulfillment
+	  or procedural requests
+	- AWS recommends new applications - look at Step Functions over SWF
+
+	Made up of:
+		- Activity Worker:  Program that ineracts with the SWF service to get
+		  tasks, process tasks and return results
+		- Decider :  program that controls coordination of tasks such as
+		             ordering, concurrency, scheduling
+
+
+[Activity ] <---API Calls--->	 [AWS SWF ]  <---API Calls--->	 [Decider ]
+[Worker ]
+
+
+
+## AWS Step Functions and Batch
+###############################
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
