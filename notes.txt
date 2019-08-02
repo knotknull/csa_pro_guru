@@ -2953,13 +2953,17 @@ https://www.youtube.com/watch?v=9TwkMMogojY
 ###################################
 
 	- Elasticity will drive most benefit from the cloud
+
 	- Think Cloud-First designs if you're in a Green Field scenario even if
 	   deploying on-prem
+
 	- If in a "Brown Field" situation, create roadmaps for cloud-first enablers
-	  like distributed applications, federated data and SOA 
+	  like distributed applications, federated data and SOA
 
+	- Be careful to not let elasticity cover for poor development methods.
 
-
+	- Microservice concepts help achieve scalability via decoupling,
+     simplification and separation of concerns
 
 
 
