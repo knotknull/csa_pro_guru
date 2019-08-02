@@ -2949,9 +2949,14 @@ Elastic Load Balancing Deep Dive and Best Practices
 https://www.youtube.com/watch?v=9TwkMMogojY
 
 
+## Architecting to Scale: Pro Tips
+###################################
 
-
-
+	- Elasticity will drive most benefit from the cloud
+	- Think Cloud-First designs if you're in a Green Field scenario even if
+	   deploying on-prem
+	- If in a "Brown Field" situation, create roadmaps for cloud-first enablers
+	  like distributed applications, federated data and SOA 
 
 
 
