@@ -2790,12 +2790,163 @@ Max provisioned capacity ___ Units                       ___ Units
 ## AWS Step Functions and Batch
 ###############################
 
+	- Managed workflow and orchestration platform
+	- Scalable and HA
+	- Define your app as a state machine
+	- Create tasks, sequential steps, parallel steps, branching paths or timers
+	- Amazon State Language declarative JSON
+	- Apps can interact and update via Step Function API,
+	  direct integration with Lambda
+	- Visual interface describes flow and realtime status
+	- Detailed logs of each step execution
+
+	- Utilizes a Finite State Machine
+
+## Task Timer Example
+
+	Start  -----> [Wait For Timestamp]  -----> [Send SNS Message] -----> End
+
+
+## AWS Batch
+
+	- Management tool for creating, managing and executing batch-oriented
+	  tasks using EC2 instances.
+			1. Create a Compute Environment:
+						- Managed or Unmanaged
+						- Spot or On-Demand
+						- vCPUs
+			2. Create a Job Queue with priority and assigned to Compute Environment
+			3. Create a Job Definition:
+						- Script or JSON
+						- env variables
+						- mount points
+						- IAM role
+						- container image, etc.
+			4. Schedule the job
+
+NOTE: Managed will scale out and tear down infrastructure
+
+
+## Comparisons
+													When													Use Case
+Step Functions         Out-of-the-box coordination		Order Processing Flow
+												AWS Service components
+
+Simple Workflow         Need to support external 			Loan Application Process
+Service									processes or specialized			w/ Manual Review Steps
+       									execution logic
+												(manual steps)
+
+Simple Queue Service    Messaging Queue; Store and  	Image Resize Process
+												forward patterns
+
+AWS Batch 							Scheduled or reoccurring 			Rotate logs daily on
+												tasks that don't require			firewall appliance
+												heavy logic
 
 
 
 
+## Elastic Map Reduce (EMR)
+###############################
+	- Collection of:
+				Hadoop, Pig, Hive, Oozie, ZooKeeper, HBase, MapReduce, HDFS,
+				fluem, sqoop, ambari
 
 
+  [ ---------------- Ambari:   Management and Monitoring ---------------- ]
+  [sqoop:        ]
+  [data transfer ] [ZooKeeper] [Oozie:  ] [Pig:     ] [Hive: ] [Mahout:] [HBase:   ]
+                   [Resource ] [Workflow] [Scripting] [SQL   ] [ML     ] [Col Store]
+  [flume:        ] [Coord    ] [MapReduce: Distributed Processing    ]
+  [log collection]						 [HDFS: Hadoop Distributed File System ]
+
+
+	- Managed Hadoop framework for processing huge amounts of data
+	- Also supports Apache Spark, HBase, Presto and Flink
+	- Used for log analysis, financial analysis, ETL
+	- A "Step" is a programatic task for performing some process on the data
+	  i.e. word count
+	- A Cluster is a collection of EC2 instances provisioned by EMR to run
+	  your Steps.
+
+														+----------+
+														| Master   |
+														| Node     |
+														+----------+
+
+	+----------+	+----------+        	+----------+   +----------+   +----------+
+	| Core     |	| Core     |          |   Task   |   |   Task   |   |   Task   |
+	| Node     |	| Node     |          |   Node   |   |   Node   |   |   Node   |
+	| (HDFS)   |	| (HDFS)   |          |          |   |          |   |          |
+	+----------+	+----------+        	+----------+   +----------+   +----------+
+
+
+## Architecting to Scale: Exam Tips
+###################################
+
+Auto Scaling Groups:
+	- Know the different scaling options (Maintain, Manual , Scheduled, Dynamic)
+	  and policies (Target Tracking Policy,  Simple Scaling Policy,  Step Scaling Policy)
+	- Understand the difference and limitations between horizontal
+	   and vertical scaling
+	- Know what a cool down periods is and how it might impact your
+	   responsiveness to demand
+
+Kinesis:
+	- Data Streams and Firehose
+	- Understand shard concept and how partition keys and sequences enabled
+	  shards to manage data flow
+
+Dynamo DB Autoscaling:
+	- Know the new / old terminology and concept of
+		 partition, partition key and sort key in the context of DynamoDB
+	- Understand how DynamoDB calculates total partitions and allocates
+     RCS and WCU across available partitions
+	- Conceptually know how data is stored across partitions
+
+CloudFront Part II:
+	- Know that both static and dynamic content is supported
+	- Understand possible origins and how multiple origins can be used
+	   together with Behaviours
+	- Know invalidation methods, zone apex, geo-restriction options
+
+SNS:
+	- Understand a loosely coupled architecture and benefits it brings
+	- Know the differnt types of subscription endpoints supported
+					HTTP(S), Email, SMS, SQS, Amazon Device Messaging, Lambda
+
+SQS:
+	- Know the difference between Standard and FIFO queues
+	- Know the difference between a Pub/Sub (SNS) and Message Queue Architecture
+
+Lambda:
+	- Know what "serverless" is in concept and how Lambda can facilitate such
+	   and architecture
+	- Know the languages supported by Lambda
+
+SWF:
+	- Understand the difference and functions of a Worker and a Decider
+	- Best suited for human-enabled workflows (manual steps, approvals)
+
+Elastic Map Reduce:
+	- Understand the parts of a Hadoop landscape
+	- Know what a Cluser is and what Steps are
+	- Understand the roles fo a Master Node, Core Nodes, and Task Nodes
+
+
+
+Videos:
+Scaling Up to your First 10 million users
+https://www.youtube.com/watch?v=w95murBkYmU
+
+Learn to Build a Cloud Scale WordPress Site that can
+keeps up with Capacity Demands
+https://www.youtube.com/watch?v=dPdac4LL884
+
+
+Elastic Load Balancing Deep Dive and Best Practices
+https://www.youtube.com/watch?v=9TwkMMogojY
 
 
 
