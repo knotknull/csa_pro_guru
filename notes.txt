@@ -489,6 +489,7 @@ MariaDB is an open-source fork of MySQL.
 	- Autoscale capacity adjusts per configured min/max levels.
 	- On-Demand Capacity for flexible capacity at a small premium cost.
 	- Achieve ACID compliance with DynamoDB Transactions
+	- Up to 400KB items **
 
 
 	Relational vs. NoSQL
