@@ -576,6 +576,11 @@ or update frequently 			for the global 												updates for non-partition
 													secondary index 											key items.
 
 
+
+## DynamoDB Accelerator (DAX)
+	- Cache requests of DynamoDB
+	- Reduce Read thruput
+
 ## Amazon Redshift
 ##########################
 
