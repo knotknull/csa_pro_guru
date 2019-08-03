@@ -2971,6 +2971,321 @@ https://www.youtube.com/watch?v=9TwkMMogojY
 ## Business Continuity
 ###################################################################################################
 
+## BC Concepts
+#################
+
+Business Continuity:
+	- Seeks to minimize business activity disruption when something unexpected happens
+
+Disaster Recovery:
+	- Act of responding to an event that threatens business continuity
+
+Fault Tolerance:
+	- Designing in the ability to absorb problems without impacting service levels
+	- "Ability to tolerate faults"
+
+High Availability:
+	- Designing in redundancies to reduce the chance of impacting service levels.
+
+Service Level Agreement:
+	- An agreed goal or target for a given service on its performance or availability.
+
+Recovery Time Objective (RTO):
+	- Time that it takes after a disruption to restore business processes to
+	  their service levels.
+		(T is for TIME)
+
+Recovery Point Objective (RTO):
+	- Acceptable amount of data loss measured in time
+		(P is for data that goes "POOF")
+
+                      +-----------------------------------+
+                      |                                   |
+                      +           DISASTER                V
+ -----[backup]------[backup]---------X---------------[Recovered]-------->
+                            <--------><--------------->
+														data lost		recover time
+                               RPO 		     RTO
+
+
+## Disaster Categories
+
+	Category													Example
+Hardware Failure					Network switch power supply fails, brings down LAN
+Deployment Failure				Deploy a patch that breaks key ERP business process
+Load Induced							DDOS attack on website
+Data Induced							Ariane 5 rocket explosion 6/4/1996 (64bit FB -> signed 16 bit)
+Credentail Expiration			SSL / TLS certificate expiration
+Dependency 								S3 subsystem failure caused numerous AWS service failures
+Infrastructure 						Construction crew cuts fiber optic cable
+Identifier Exhaustion		  "don't have sufficient capacity in AZ you requested"
+
+Human error								truncate table invoices
+
+
+
+## Disaster Recovery Architectures
+##################################
+
+## Backup & Restore
+	Pros:
+		- Very common entry point into AWS
+		- Minimal effort to configure
+	Cons:
+		- Least flexibility
+		- Analogous to off-site backup storage
+
+## Pilot Light
+	Pros:
+		- Cost effective way to maintain a "hot site" concept
+		- Suitable for a variety of landscapes and applications
+	Cons:
+		- Usually requires manual intervention for failover
+		- Spinning up cloud environments will take minutes or hours
+		- Must keep AMIs up-to-day with on-prem counterparts
+
+## Warm Standby
+	Pros:
+		- All services are up and ready to accept a failover faster within
+		  minutes or seconds
+		- Can be used as a "shadow env" for testing / prod staging
+	Cons:
+		- Resources would need to be scaled to accept production load
+		- Still requires some env adjustments but could be scripted
+
+## Multi-Site
+	Pros:
+		- Ready all the time to take full production load
+				- effectively a mirrored data center
+		- Fails over in seconds or less
+		- No or little intervention required to fail over
+	Cons:
+		- Most expensive DR option
+		- Can be perceived as wasteful as you have resources idling until
+		  primary failure
+
+
+## Storage Options for HA / BC
+##################################
+
+## EBS Volumes
+	- Annual Failure Rate less than 0.2% compared to commodity hardware at 4%.
+	  (Out of 1000 EBS volumes, expect 2 to fail)
+	- Availability target of 99.999%
+	- Replicated automatically within a single AZ
+	- Vulnerable to AZ failure
+	- Easy to snapshot, which is stored on S3 and multi-AZ durable
+	- Can copy snapshots to other regions as well
+	- Supports RAID configurations
+
+								RAID 0				RAID 1				RAID 5				RAID 6
+Redundancy			None					1 drv fail  	1 drv fail 		2 drv can fail
+Reads						****			 		***						****					****
+Writes					****			 		***						**			  		*
+Capacity				100%					50%						(n-1)/n				(n-2)/n
+
+n=number of drives
+
+RAID 0 - single disk
+RAID 1 - mirror disk (2 drives)
+RAID 5 - 3 drives, write on 2, parity bit on 1
+RAID 6 - 3 drives, write on 2, 2 types of parity on 2 drives
+
+
+NOTE: AWS DOES NOT RECOMMEND RAID 5 or RAID 6 because parity bits writes
+      consume IOPS
+
+						Volume			Provisioned		Total Volume		Usable
+RAID				Size					IOPS					IOPS					Space			Throughput
+No RAID			1- 1000 GB		4000					4000					1000 GB			500 MB/s
+RAID 0			2- 500 GB			4000					8000					1000 GB			1000 MB
+RAID 1			2- 500 GB			4000					4000					1000 GB			500 MB/s
+
+
+## S3 Storage
+
+Classic									Availability					Unavailable
+Standard Storage					99.99%								52.6 min / yr
+Standard Infrequent				99.9%									8.76 hr / yr
+One-Zone Infrequent				99.5%									1.83 days / yr
+
+	- Durability = Eleven 9s  99.999999999%
+	- Standard and Standard-IA have multi-AZ durability
+	- One-zone has single AZ durability
+	- Backing service for EBS snapshots and many other services
+
+
+
+## EFS
+	- Implementation of NFS
+	- True file system as opposed to block storage (EBS)
+		or object storage (S3)
+	- File locking, strong consistency, concurrently accessible
+	- Each file object and metadata is stored across multiple AZs
+	- Can be accessed from all AZs concurrently
+	- Mount targets are highly available
+
+## Amazon Storage Gateway
+	- Good way to migrate on-prem data to AWS for offsite backup
+	- Best for continuous sync needs
+
+## Snowball
+	- Various options for migrating data to AWS based on volume
+	- Only for batch transfers of data
+
+## Glacier
+	- Safe offsite archive storage
+	- Long-term storage with rare retrieval needs.
+
+
+## Compute Options for HA / BC
+##################################
+
+## HA Approaches for Compute
+		- Up to date AMIs are critical for rapid fail-over
+		- AMIs can be copied to other regions for safety or DR staging
+		- Horizontally scalable architectures preferred because risk
+		  spread across multiple smaller machines vs. 1 large machine
+		- Reserved instances only way to GUARANTEE that resources will be
+		  available when needed
+		- Auto Scaling and Elastic Load Balancing work together to provide
+		  automated recovery by maintaining minimum instances
+		- Route 53 Health Checks provide for "self-healing" redirection of traffic
+
+
+## Database Options for HA / BC
+##################################
+
+## HA Approaches for Databases
+	- Choose DynamoDB over RDS because of inherent fault tolerance.
+	- If DynamoDB can't be used, use Aurora because of redundance and
+	  automatic recovery features.
+	- If Aurora can't be used, choose Mult-AZ RDS.
+	- Frequent RDS snapshots can protect against data corruption or failures
+	  and they won't impact performance of a multi-AZ deployment.
+	- Regional replication is an option but will not be strongly consistent.
+	- Database on EC2, design HA yourself
+
+## HA Notes for Redshift
+	- Currently does not support multi-AZ deployments.
+	- Best HA option is to use a multi-node cluster which support data
+	  replication and node recovery
+	- A single node Redshift cluster does not support data replication,
+	  have to restore from a snapshot on S3 if drive fails.
+
+
+## HA Notes for ElastiCache
+##################################
+
+Memcached
+	- Because Memcached does not support replication, a node failure
+	  will result in data loss.
+	- Use multiple nodes in each shard to minimize data loss on node failure
+	- Launch multiple nodes across available AZs to minimize data loss on AZ failure
+
+Redis
+	- Use multiple nodes in each shard and distribute the nodes across multiple AZs
+	- Enable multi-AZ on the replication group to permit automatic failover if the
+	  primary node fails.
+	- Schedule regular backups of your Redis cluster.
+
+
+## HA Approaches for Networking
+##################################
+
+	- Create subnets in available AZs, you create multi-AZ presence for you VPC
+	- Best practice is to create at least two VPN tunnels into your
+	  Virtual Private Gateway
+	- Direct Connect is not HA by default, so you need to establish a second
+	  connection via another Direct Connect (ideally with another provider) or
+		use a VPN.
+	- Route 53 Health Checks provide basic level of redirecting DNS resolution
+	- Elastic IPs allow you flexibility to change out backing assets without
+	  impacting name resolution.
+	- For multi-AZ redundancy of NAT GW, create gateways in each AZ with routes
+	  for private subnets to use the local GW.
+
+## Exam Tips
+##################################
+
+## General Concepts
+	- Know the difference between BC, DR and Service Levels
+	- Know the difference between High Availability and Fault Tolerance
+	- Understand the inter-relationships and how AWS uses the terms
+	- Know the difference between RTO and RPO
+	- Know the four general types for DR architectures and trade-offs
+
+## Storage Options
+	- Understand the HA capabilities and limitations of AWS storage options
+	- Know when to use each storage option to achieve the required level
+	  of recovery capability
+	- Understand RAID and the potential benefits and limitations
+
+## Compute Options
+	- Understand why horizontal scaling is preferred from an HA perspective
+	- Know that compute resources are finite in an AZ and how to gurantee their
+	  availability
+	- Understand how Auto Scaling and ELB can contribute to HA
+
+## Database Options
+	- Know the HA attributes of the various Database services
+	- Understand the different HA approaches and risks for Memcached and Redis
+	- Know which RDS options require manual failover and which are automatic
+	 	(Primary vs. Seconary vs. Read Replica)
+
+## Network Options
+	- Know which networking components are not redundant across AZs and how to
+	  architect for them to be redundant
+	- Understand the capabilities of Route 53 and Elastic IP in context
+
+
+Videos:
+
+Models of Availability
+https://www.youtube.com/watch?v=xc_PZ5OPXcc
+
+How to Design a Multi-Region Active-Active Architecture
+https://www.youtube.com/watch?v=RMrfzR4zyM4
+
+Disaster Recovery with AWS: Tiered approaches to balance
+cost with recovery objectives
+https://www.youtube.com/watch?v=a7EMou07hRc
+
+
+
+## Pro Tips
+##################################
+
+
+## Failure Mode and Effects Analysis (FMEA)
+	Systematic process to examine:
+		- What could go wrong
+		- What impact it might have
+		- What is likelihood of it occuring
+		- What is our ability to detect and react
+
+	Risk Priority Number = Severity * Probability * Detection
+
+## FMEA Across Disaster Categories
+
+        							Customer									Detect and			Risk Priority
+Category							Impact			Likelihood 		React						Number
+HW Failure							9							5							2							90
+Deploy Failure					9							1							2							18
+Load Induced						5							5							2							50
+Data Induced						6							1							6							36
+Credential Expire				7							6							7						 294
+Dependency							7							7							2							98
+Infrastructure					8							5							9						 360
+Identifier Exhaustion 	2							2							2							 8
+
+
+
+
+###################################################################################################
+## Deployment and  Operations Management
+###################################################################################################
+
 
 
 
