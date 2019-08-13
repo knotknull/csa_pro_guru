@@ -3458,6 +3458,96 @@ NOTE: By default Stack Policy protect everything, hence Allow statement first
 ## Elastic Container Service
 ############################
 
+	- Elastic Container Service  (ECS)
+	- Elastic Kubernetes Service (EKS)
+
+
+		ECS  																					EKS
+           Managed HA, sclable contianer platform
+
+AWS specific platform for Docker							Compatible w/ upstreak K8s can be
+																							lift and shift from other K8s
+
+Simpler to learn / use 												Feature rich w/ steep learning curve
+
+Leverages Route 53, ALB, CloudWatch 					Hosted K8s platform that handles
+																							many things internally
+
+Tasks are instances of containers 						Pods are containers collocated with one
+that run on compute but are isolated					another can can have shared access
+																							to each other
+
+Limited extensibility 												Extensible via 3rd party and add-ons
+
+
+
+# ECS Launch Types
+
+		EC2  																					Fargate
+You explicitly provision EC2 instances 				Control plane asks for resources and
+																							Fargate automatically provisions
+
+Responsible for upgrading, patching 					Fargate provisions compute as needed
+care of EC2 pool
+
+Must handle cluster optimization 							Fargate handles cluster optimization
+
+granular control over infrastructure					Limited control, infra automated
+
+
+## API Gateway
+############################
+
+	- Manged, high availability service to front-end REST APIs
+	- Backed w/ custom code via Lambda, as a proxy for another AWS Service or
+	  any other HTTP API on AWS or elsewhere
+	- Regionally based, private or edge optimized (deployed via CloudFront)
+	- Support API Keys and Usage Plans for user id, throttling and quota maangement.
+	- Uses CloudFront behind the scenes and custom domains and SNI is supported
+	- Can be published as products and montetized on AWS Marketplace
+
+NOTE: API Gateway can cache responses
+
+
+## Management Tools
+############################
+
+# AWS Config
+  - Allows you to assess, audit and evaluate configurations of your AWS resources
+  - Useful for Configuration Management as part of ITIL program
+  - Creates a baseline of various configuration settings and files which can
+	  track variations against the baseline.
+  - AWS Config Rules can check resources for certain desired conditions and
+	  violations are flagged as non-compliant
+
+Config Rules ex.
+	- Is Backup enabled on RDS
+	- Is CloudTrail enabled on the AWS account
+	- Are EBS volumes encrypted
+
+
+# AWS OpsWorks
+	- Managed instance of Chef and Puppet
+	- Provide config management to deploy code, automate tasks, config instances ...
+	- Three offerings:
+			- OpsWOrks for Chef Automate:      Fully managed Chef
+			- OpsWOrks for Puppet Enterprise:  Fully managed Puppet
+			- OpsWOrks Stacks :  Uses embedded Chef solo client installed on EC2
+			                     instances to run Chef recipes
+		- OpsWOrks Stacks support EC2 instances and on-prem servers w/ agent
+
+	- Stacks are collections of resources needed to support a service or application
+	- Layers represent different components of application delivery hierarchy
+	- EC2 instances, RDS instances and ELBs are examples of Layers
+	- Stacks can be cloned - only within same region
+	- Though OpsWorks is Global Services, can create a stack to a particular region
+	  and can only control resources in that region.
+			ex.
+					Cant manage EC2 in EU-CENTRAL-1 from OpsWOrks in US-EAST-2
+
+
+
+
 
 
 
