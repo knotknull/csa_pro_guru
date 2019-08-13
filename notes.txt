@@ -3398,7 +3398,6 @@ Elastic Beanstalk Deployment Options:
 
 
 
-
 ## CloudFormation
 ####################
 
@@ -3586,6 +3585,106 @@ Run Command		Run commands and scripts without logging    Run a shell script on 5
 Patch					Automates process of patching instances 		Keep a fleet at same patch level
 Manager				for updates 																by applying security patches during
 																													next Maintenance Window
+
+
+Patch Manager Baselines:
+	- Manage which patches are auto approved
+	- AWS provides pre-defined baselines for supported OSes
+	- Can create custom baselines
+
+
+## AWS System Manager Documents
+	- Define actions that System Manager performs
+	- JSON or YAML files w/ steps and parameters
+
+Types							Used With									Purpose
+=====							========= 								========
+Command 					Run Command							Run Command uses command documents to
+Document					State Manager						execute commands. State Manager uses
+																					command documents to apply a configuration.
+																					These actions can be run on one ore more
+																					targets at any point during the lifecycle of
+																					of an instance
+
+Policy 						State Manager						Policy documents enforce a policy on your
+Document																	targets.  If policy document removed, policy
+																					action no longer happens.
+
+Automation 				Automation 							Use automation documents when performing
+Document																	common maintenance and deployment tasks such
+																					as creating or updating an AMI.
+
+
+
+## Exam Tips
+############################
+
+Types of Deployments:
+	- understand the types of deployments and when each might be preferred
+	- know methods that blue/green can be implemented (Route 53, ASG, etc.)
+		  know when it is not recommended
+
+Continuous Integration and Continuous Deployment
+	- Understand conceptually between Continuous Integration, Delivery, Deployment
+	- Know what AWS tools can be used to facilitate:
+				CodeCommit, CodeBuild, CodeDeploy, CodePipeline
+
+Elastic Beanstalk:
+	- Know components of Elastic Beanstalk and platforms supported
+			Docker, PHP, Java, Node.js
+	- Understand Deployment options and tradeoffs:
+ 			- All At Once / Rolling / Rolling w/ Additional Batch / Immutable / Blue / Green
+
+Cloud Formation :
+	- Understand how CloudFormation delivers IaC
+	- Hands-on CloudFormation
+
+ECS :
+	- Know difference between ECS and EKS
+	- Understand the difference between EC2 Launch Types and Fargate Launch Types
+
+API Gateway :
+	- Understand what and how you deploy an API to API Gateway
+	- Remember that API Gateway is designed to server up REST APIs
+
+Management Tools :
+	- Know Config and COnfig Rule
+	- Different flavors of AWS OpsWOrks and what Chef and Puppet offer
+	- Understand difference between AWS OpsWorks Stacks and OpsWOrks for Chef Automate
+	- Remember OpsWorks is a global service but can only manage resources in region created
+
+System Manager :
+	- Know various Services
+				Inventory State Mgr / Logging / Parameter Store / Insight Dashboards
+				Resource Groups / Maintenance Windows / Automation / Run Command / Patch Manager
+	- Can manage AWS and on-prem systems
+	- Understand Patch manager pre-defined baselines
+	- Understand SSM Document types
+					Command / Policy / Automation
+
+
+
+Videos:
+
+Deep Dive on AWS CloudFormation
+https://www.youtube.com/watch?v=01hy48R9Kr8
+
+Moving to Containers: Building with Docker and Amazon ECS
+https://www.youtube.com/watch?v=Qik9LBktjgs
+
+Continuous Integration Best Practices for Software Development Teams
+https://www.youtube.com/watch?v=GEPJ7Lo346A
+
+
+
+
+## Pro Tips
+############################
+	- Use Cloud first design (leverage cloud enabled services for solutions)
+	- Blue / Green is not just for web apps
+	- IaC can be tough, training is key
+	- API Gateway + Lambda allows for agility and efficiency on serverless platforms. 
+
 
 
 
