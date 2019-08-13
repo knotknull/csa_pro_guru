@@ -3546,9 +3546,46 @@ Config Rules ex.
 					Cant manage EC2 in EU-CENTRAL-1 from OpsWOrks in US-EAST-2
 
 
+## AWS System Manager
+############################
 
+	- Centralized console and toolset for a wide variety of system management tasks
+	- Designed for managing large fleed ot systems
+	- SSM Agent enables System Manager features and support all OSs
+	- SSM Agent installed by default on recent AWS-provided base AMIs for Linux
+	  and Windows
+	- Manages AWS-based and on-prem systems via the SSM Agent
 
+# Services
+Services		Description																			Example
+========		===============																	========
+Inventory		Collect OS, app, and instance meta data				Which instances have Apache 2.2
+State Mgr		Represents machines that have certain config  Keep track of which have updated Apache
+																													(pre-upgrade vs. post-upgrade)
+Logging 		CloudWatch Log agent and stream logs					Stream logs of webservers to CloudWatch
+						directly to CloudWatch
 
+Parameter 	Shared secure storage for config data, 				Store / retrieve RDS credentials
+Store				connection strings, passwords, etc.						to append to a config file upon boot.
+
+Insight	 		Account-level view of Cloudtrail, Config, 		Single viewport for any exceptions
+Dashboards	Trust Advisor 																on config compliance
+
+Resource		Group resource thru tagging for organization 	Create a dashboard for all assets
+Groups																										belonging to our Production ERP
+
+Maintenance		Define schedules for instances to patch, 		Define hours of 0:00 to 2:00
+Windows				update apps, run scripts and more 					as maintenace window for Patch Manager
+
+Automation		Automate routine tasks and scripts 					Stop DEV/QA instances every
+																													Friday and restart Monday morning
+
+Run Command		Run commands and scripts without logging    Run a shell script on 53 different
+							in via SSH or RDP														instances at the same time.
+
+Patch					Automates process of patching instances 		Keep a fleet at same patch level
+Manager				for updates 																by applying security patches during
+																													next Maintenance Window
 
 
 
