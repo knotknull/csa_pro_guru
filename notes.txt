@@ -3683,7 +3683,308 @@ https://www.youtube.com/watch?v=GEPJ7Lo346A
 	- Use Cloud first design (leverage cloud enabled services for solutions)
 	- Blue / Green is not just for web apps
 	- IaC can be tough, training is key
-	- API Gateway + Lambda allows for agility and efficiency on serverless platforms. 
+	- API Gateway + Lambda allows for agility and efficiency on serverless platforms.
+
+
+###################################################################################################
+## Cost Management
+###################################################################################################
+
+
+## Concepts
+############
+
+Capital Expenses (CapEx)
+	- Money spent on long-term assets like property, buildings and equipment
+
+Operational Expenses (OpEx)
+	- Money spent of on-going costs for running the business.
+	  Usually considered variable expenses
+
+Total Cost of Ownership (TCO)
+	- Comprhensive look at the entire cost model of a given decision or option,
+	  including hard and soft costs
+
+Return On Investment (ROI)
+	- Amount an entity can expect to receive back within a certain amount of time
+	  given an investment
+
+
+## Cost Optimization Strategies
+################################
+
+# Appropriate Provisioning
+	- Provision the resource you need and nothing more
+	- Consolidate where possible for greater density
+			multi-database RDS, containers
+	- CloudWatch can help by monitoring utilization
+
+
+# Right-Sizing
+	- Using lowest-cost resource that still meets the technical specifications
+	- Architecting for most consistent use of resources is best vs.
+	   peaks and vallesy
+	- Loosely coupled architectures using SNS, SQS, Lambda and DynamoDB can
+	  smooth demand and create more predictability and consistency
+
+# Purchase Options
+	- For permanent applications or needs, Reserved Instances provide the best
+	  cost advantage
+	- Spot instances are best for temporary horizontal scaling.
+	- EC2 Fleet lets you define target mis of On-Demand, Reserved and Spot instances.
+
+Instance			On Demand 		Reserved (1yr Upfornt)		Spot Instance (9/2018)
+========			========= 		======================    ======================
+m5.2xlarge    $0.384						$0.229 (40% less)				$0.0798 (79% less)
+
+
+# Geographic Selection
+	- AWS Pricing can vary from region to region
+	- Consider potential savings by locating resources in a remote region if
+    local access is not required
+	- Route53 and CloudFront can be used to reduce potential latency of a
+    remote region
+
+   Region								S3 Standard Storage First 50 TB
+============						==================================
+  us-west-2										$0.023 per GB
+  us-west-1										$0.026 per GB
+  ap-northeast-1							$0.025 per GB
+  sa-east-1										$0.0405 per GB
+
+
+# Managed Services
+	- Leverage managed services such as MySQL RDS over self-managed options
+	  such as MySQL on EC2.
+	- Cost savings gainted thru lower complexity and manual intervention
+	- RDS, RedShift, Fargate and EMR are great examples of fully-managed
+    services that replace traditionally complex and difficult installations
+		with push-button ease.
+
+# Optimized Data Transfer
+	- Data going out and between AWS regions can become a significant cost component
+	- Direct Connect can be a more cost-effective option given data volume
+	  and speed
+
+
+## Tagging and Resource Groups
+################################
+
+# AWS Tagging
+	- The number one best thing you can do to help manage AWS Assets
+	- Tags are arbitrary name/value pairs that you can assign to AWS assets to
+	   server as metadata
+	- Tagging strategies can be used for Cost Allocation, Security, Automation and
+     other uses
+		 		ex.  Tag an IAM policy to implement access to certain resources
+	- Enforcing standardized tagging can be done via AWS Config Rules or custom scripts
+				ex. EC2 instance not properly tagged are stopped or terminated nightly
+	- Most resources can have up to 50 tags
+
+# AWS Resource Groups
+	- Resource Groups are groupings of AWS assets defined by tags.
+	- Create custom consoles and consolidate metrics, alarms and config details
+	  around given tags.
+	- Common Resource Groupings:
+			- Env (DEV, QA,  PROD)
+			- Project Resources
+			- Collection of resources supporting key business process
+			- Resources allocated to various dept or cost centers
+
+	- Access via console > Resource Groups > Classic Groups
+																					 Create a Group (new)
+																					 Tag Editor
+
+
+## Spot Instances and Reserved Instances
+#########################################
+
+# Reserved Instances
+	- Purchase usage of EC2 instances in advance for a significant discount
+	  over On-Demand pricing
+	- Provides capacity reservation when used in a specific AZ
+	- AWS Billing automaticall applies discounted rates when you launch an instance
+	  that matches your purchased RI
+	- EC2 has three RI types:
+				- Standard
+				- Convertible
+				- Scheduled
+	- Can be shared acrosss multiple accounts w/ Consolidated Billing
+	- If you find you don't need your RI's, you can try to sell them on the
+	  Reserved Instance Marketplace
+
+      							Standard											Convertible
+Terms								1 yr, 3 yr 										1 yr, 3 yr
+
+Avg Discount				40 - 60% 											31% - 54%
+off On-demand
+
+Change AZ, 					Yes via 											Yes via ExchangeReservedInstance
+Instance Size,  		ModifyReservedInstance				API or console
+Networking Type			API or console
+
+Change instance 			No 														Yes
+family, OS, Tenancy
+Payment Options
+
+Benefit from   				No 														Yes
+Price Reductions
+
+Sellable on 					Yes 													Coming SOon
+Reserved Instance 	(Sale proceeds must be)
+Marketplace 				(deposited to US bank account)
+
+
+# Reserved Instance Attributes
+	- Instance Type:  designates CPU, memory, networking capabilty
+	- Platform :  Linux, SUS Linux, RHEL, Microsoft Windows, Microsoft SQL Server
+	- Tenancy  :  Default (shared) tenancy or Dedicated tenancy
+	- Availability Zone (optional):  if AZ is selected, RI is reserved and
+	      discount applies to that AZ (Zonal RI).
+				 		If NO AZ is specified, no reservation is created but discount is
+						applied to any instance in the family in any AZ in the region
+						(Regional RI)
+
+NOTE: you can change a Zonal RI to a Regional RI via the console or
+      ModifyReservedInstance API
+
+NOTE: Zonal RI guarantees availability in the AZ, a Regional RI does not
+
+NOTE: Instance size flexibility is only available for Linux/Unix Regional RIs
+      with default tenancy.  NOT AVAILABLE for Windows, RHEL or SUSE.
+
+
+# Spot Instances
+	- Excess EC2 capacity that AWS tries to sell on a market exhange basis
+	- Customer creates a Spot Request and specifies AMI, desired instance types,
+	  and other key information
+	- Customer defines highest price willing to pay for instance. If capacity is
+	  constrained and others are willing to pay more, your instance might get
+		terminated or stopped.
+	- Spot request can be:
+			- One-Time Request ("fill and kill")
+			- maintain
+			- duration-based
+	- For One-Time Request, instance is terminated and ephemeral data lost
+	- For "Request and Maintain, instance can be configured to Terminate, Stop or
+	  Hibernate until price point can be met again.
+
+NOTE: Spot Instance pricing can vary between AZs
+
+
+# Dedicated Instances and Hosts
+
+	Dedicated Instance
+		- Virtualized  instances on hardware just for you
+		- May share hardware with other non-dedicated instances in same account
+		- Available as On-Demand, Reserved Instances and Spot Instances
+		- Cost additional $2 per hour per region
+
+	Dedicated Hosts
+		- Physical servers dedicated to just your use
+		- You then have control over shich instances are deployed on that host
+		- Available as On-Demand or with Dedicated Host Reservation
+		- Useful if you have server-bound software licenses that use metrics
+		  like per-core, per-socket or per-VM
+		- Each dedicated host can only run one EC2 instances size and type
+
+
+## Cost Management Tools
+#########################
+
+# AWS Budgets
+	- Allow you to set pre-defined limits and notifications if nearing a
+	  budget or exceeding the budget
+	- Can be based on Cost, Usage, Reserved Instance Utilization or
+	  Reserved Instance Coverage
+	- Useful as a method to distribute cost and usage awareness and
+	  responsibility to platform users.
+
+
+# Consolidated Billing
+	- Enable a single Payer account that's locked down to only those who
+	  need access.
+	- Economies of scale by bringing together resource consumption across accounts.
+
+ex.
+								Acct A 			Acct B 			Acct C 			Billed Indiv 		Consolidated
+S3 storage			50 TB				50 TB				50 TB				$3,450 						$3,350
+
+				us-east-2 S3 Pricing:   First 50 TB: $0.023 per GB
+				                        Next 450 TB: $0.022 per GB
+
+# Trusted Advisor
+	- Runs a series of checks on your resources and proposes improvements
+	- Can help recomment cost optimization adjustments like RI or scaling adjustments
+	- Core checks are available to all customers
+	- Full Trusted Advisor benefits require a Business or Enterprise support plan
+
+
+
+## Exam Tips
+#########################
+Costing in General:
+	- Understand diff between CapEx and OpEx
+	- Understand TCO, ROI and challenges
+
+Costing Optimization Strategies :
+	- Know ways customers can approach cost optimization
+					# Appropriate Provisioning 			# Geographic Selection
+					# Right-Sizing 									# Managed Services
+					# Purchase Options							# Optimized Data Transfer
+	- Understand Cost Optimization Pillar whitepaper
+
+Tagging and Resource Groups:
+	- Understand common uses for tagging and ways you can implement / enforce
+	  a tagging strategy  (AWS Config)
+	- Know when and how to create Resource Groups
+				Just logical grouping of tags
+
+Spot and Reserved Instances:
+	- Know difference and limitation of Reservation Instances (Zonal and Regional)
+	- Understand how Spot Instances work and when best used
+	- Understand Dedicated Instances vs. Dedicated Hosts
+
+Cost Management Tools:
+	- Know host and when to use AWS Budgets
+	- Understand benefits of consolidated billing
+	- Know how Trusted Advisor and help optimize
+
+
+Videos:
+
+Building a Solid Business Case for Cloud Migration
+https://www.youtube.com/watch?v=CcspJkc7zqg
+
+Running Lean Architectures: How to Optimize for Cost Efficiency
+https://www.youtube.com/watch?v=XQFweGjK_-o
+
+How Hess Has Continued to Optimize the AWS Cloud After Migrating
+https://www.youtube.com/watch?v=1Z4BfRj2FiU
+
+
+
+## Pro Tips
+#########################
+
+	- Be careful around TCO and ROI minefield.
+			- bring in finance !!
+			- don't forget soft costs
+					(utilize Harvard Business Review / MIT Sloan Management Review)
+			- Watch out for Vendor cost savings
+	- Real benefit of Cloud Migration is in Agility and Flexibility
+		  Cost alone is not typically strongest business case.
+	- Think of cost optimization as long-term effort
+			Don't spend time on trying to micro-manage it up-front.
+	- Implement a Tagging Strategy immediately
+	- Be aggressive in formulating a pilot project:  Large-scale benefits make for
+	  dramatic business cases, where small-scale wins can easily be ignored.
+
+
+
+
+
+
 
 
 
