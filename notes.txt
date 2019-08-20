@@ -3980,7 +3980,7 @@ https://www.youtube.com/watch?v=1Z4BfRj2FiU
 	- Be aggressive in formulating a pilot project:  Large-scale benefits make for
 	  dramatic business cases, where small-scale wins can easily be ignored.
 
-
+NOTE: Guranteed availability for an RI can only be done if assigned to an AZ
 
 
 
